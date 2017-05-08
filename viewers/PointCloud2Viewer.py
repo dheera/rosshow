@@ -7,9 +7,7 @@ from .TermGraphics import TermGraphics
 class PointCloud2Viewer(object):
     def __init__(self):
         self.g = TermGraphics()
-        self.xmin = -10
         self.xmax = 10
-        self.ymin = -10
         self.ymax = 10
 
     def update(self, data):
@@ -17,8 +15,9 @@ class PointCloud2Viewer(object):
         self.g.clear()
         w = self.g.shape[0]
         h = self.g.shape[1]
+        self.ymax = self.xmax * h/w
         for x, y, z in points:
-            i = int(w * (x - self.xmin) / (self.xmax - self.xmin))
-            j = int(h * (1 - (y - self.ymin) / (self.ymax - self.ymin)))
+            i = int(w * (x + self.xmax) / (2 * self.xmax))
+            j = int(h * (1 - (y + self.ymax) / (2 * self.ymax)))
             self.g.point((i,j))
         self.g.draw()
