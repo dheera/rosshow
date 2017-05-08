@@ -123,6 +123,15 @@ class TermGraphics(object):
         self.line((point1[0], point1[1]), (point1[0], point0[1]))
         self.line((point1[0], point0[1]), (point0[0], point0[1]))
 
+    def image(self, image_data, point):
+        """
+        Draw a binary image with the top-left corner at point = (x0, y0).
+        """
+        for i in image_data.shape[0]:
+            for j in image_data.shape[1]:
+                if image_data[i, j] > 0:
+                    self.point(point[0] + i, point[1] + j)
+
     def draw(self):
         """
         Shows the graphics buffer on the screen. Must be called in order to see output.
