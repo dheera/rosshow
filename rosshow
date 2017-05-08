@@ -29,5 +29,10 @@ if __name__ == "__main__":
         rospy.Subscriber(TOPIC, PointCloud2, viewer.update)
         rospy.spin()
 
+    if topics[TOPIC] == 'sensor_msgs/Imu':
+        viewer = ImuViewer()
+        rospy.Subscriber(TOPIC, Imu, viewer.update)
+        rospy.spin()
+
     else:
         print("Topic type not supported")
