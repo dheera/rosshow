@@ -15,8 +15,8 @@ class PointCloud2Viewer(object):
     def update(self, data):
         points = list(pcl2.read_points(data))
         self.g.clear()
-        w = self.g.shape[0]*2
-        h = self.g.shape[1]*4
+        w = self.g.shape[0]
+        h = self.g.shape[1]
         for x, y, z in points:
             i = int(w * (x - self.xmin) / (self.xmax - self.xmin))
             j = int(h * (y - self.ymin) / (self.ymax - self.ymin))
