@@ -19,6 +19,6 @@ class PointCloud2Viewer(object):
         h = self.g.shape[1]
         for x, y, z in points:
             i = int(w * (x - self.xmin) / (self.xmax - self.xmin))
-            j = int(h * (y - self.ymin) / (self.ymax - self.ymin))
+            j = int(h * (1 - (y - self.ymin) / (self.ymax - self.ymin)))
             self.g.point((i,j))
         self.g.draw()
