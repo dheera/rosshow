@@ -3,45 +3,127 @@
 import math
 from .termgraphics import TermGraphics
 
+class AnglePlotter(object):
+    def __init__(self, g, xmin = 0, xmax = 1, ymin = 0, ymax = 1):
+        self.g = g
+        self.xmin = xmin
+        self.xmax = xmax
+        self.ymin = ymin
+        self.ymax = ymax
+
+    def plot(self, angle):
+        width, height = self.g.shape
+        self.g.rect(
+          (int(self.xmin), int(self.ymin)),
+          (int(self.xmax), int(self.ymax)),
+        )
+        self.g.line(
+          (int(1 + self.xmin + (self.xmax - self.xmin)/2 - (self.xmax - self.xmin)/2*math.cos(angle)),
+          int(1 + self.ymin + (self.ymax - self.ymin)/2 - (self.ymax - self.ymin)/2*math.sin(angle))),
+          (int(1 + self.xmin + (self.xmax - self.xmin)/2 + (self.xmax - self.xmin)/2*math.cos(angle)),
+          int(1 + self.ymin + (self.ymax - self.ymin)/2 + (self.ymax - self.ymin)/2*math.sin(angle))),
+        )
+
+class ScopePlotter(object):
+    def __init__(self, g, xmin = 0, xmax = 1, ymin = 0, ymax = 1, n = 128):
+        self.g = g
+        self.xmin = xmin
+        self.xmax = xmax
+        self.ymin = ymin
+        self.ymax = ymax
+        self.data_max = 0.0001
+        self.data_min = -0.0001
+        self.data = [ 1. ] * n
+        self.pointer = 0
+
+    def plot(self, value):
+        self.data[self.pointer] = value
+        self.pointer = (self.pointer + 1) % len(self.data)
+        self.data_max = max(self.data_max, max(self.data))
+        self.data_min = min(self.data_min, min(self.data))
+        points = []
+        for i in range(len(self.data)):
+           points.append(
+             (i/len(self.data)*(self.xmax - self.xmin) + self.xmin,
+             (self.data[i] - self.data_min) / (self.data_max - self.data_min) * (self.ymax - self.ymin) + self.ymin)
+           )
+        self.g.points(points)
+
 class ImuViewer(object):
+
     def __init__(self):
         self.g = TermGraphics()
         self.xmax = 10
+        self.yaws = [ 0. ] * 128
+        self.yaws_p = 0
+        self.pitches = [ 0. ] * 128
+        self.pitches_p = 0
+        self.rolls = [ 0. ] * 128
+        self.rolls_p = 0
+
+        margin = self.g.shape[1]/16.
+        plotter_size = self.g.shape[1]/4.
+
+        self.yaw_angle_plotter = AnglePlotter(self.g,
+            xmin = margin,
+            ymin = margin,
+            xmax = margin + plotter_size,
+            ymax = margin + plotter_size,
+        )
+
+        self.yaw_scope_plotter = ScopePlotter(self.g,
+            xmin = 2*margin + plotter_size,
+            ymin = margin,
+            xmax = self.g.shape[0]/2 - margin/2,
+            ymax = margin + plotter_size,
+        )
+
+        self.pitch_angle_plotter = AnglePlotter(self.g,
+            xmin = margin,
+            ymin = 2*margin + plotter_size,
+            xmax = margin + plotter_size,
+            ymax = 2*margin + 2*plotter_size,
+        )
+
+        self.pitch_scope_plotter = ScopePlotter(self.g,
+            xmin = 2*margin + plotter_size,
+            ymin = 2*margin + plotter_size,
+            xmax = self.g.shape[0]/2 - margin/2,
+            ymax = 2*margin + 2*plotter_size,
+        )
+
+        self.roll_angle_plotter = AnglePlotter(self.g,
+            xmin = margin,
+            ymin = 3*margin + 2*plotter_size,
+            xmax = margin + plotter_size,
+            ymax = 3*margin + 3*plotter_size,
+        )
+
+        self.roll_scope_plotter = ScopePlotter(self.g,
+            xmin = 2*margin + plotter_size,
+            ymin = 3*margin + 2*plotter_size,
+            xmax = self.g.shape[0]/2 - margin/2,
+            ymax = 3*margin + 3*plotter_size,
+        )
 
     def update(self, data):
         a = data.orientation.x / 16384.
         b = data.orientation.y / 16384.
         c = data.orientation.z / 16384.
         d = data.orientation.w / 16384.
+
         yaw = math.atan2(2*a*b+2*c*d, 1-2*b*b-2*c*c)
         pitch = math.asin(2*(a*c-b*d))
         roll = math.atan2(2*a*d+2*b*c, 1-2*c*c-2*d*d)+math.pi
-        width = self.g.shape[0]
-        height = self.g.shape[1]
-        hmargin = height / 16
+
         self.g.clear()
-        # yaw
-        self.g.rect((int(hmargin), int(hmargin)), (int(hmargin + height/4), int(hmargin + height/4)))
-        self.g.line(
-          (int(1 + hmargin + height/8 - height/8 * math.cos(yaw)),
-          int(1 + hmargin + height/8 - height/8 * math.sin(yaw))),
-          (int(1 + hmargin + height/8 + height/8 * math.cos(yaw)),
-          int(1 + hmargin + height/8 + height/8 * math.sin(yaw))),
-         )
-        # pitch
-        self.g.rect((int(hmargin), int(2*hmargin + height/4)), (int(hmargin + height/4), int(2*hmargin + 2*height/4)))
-        self.g.line(
-          (int(1 + hmargin + height/8 - height/8 * math.cos(pitch)),
-          int(1 + 2 * hmargin + 3*height/8 - height/8 * math.sin(pitch))),
-          (int(1 + hmargin + height/8 + height/8 * math.cos(pitch)),
-          int(1 + 2 * hmargin + 3*height/8 + height/8 * math.sin(pitch))),
-         )
-        # roll
-        self.g.rect((int(hmargin), int(3*hmargin + 2*height/4)), (int(hmargin + height/4), int(3*hmargin + 3*height/4)))
-        self.g.line(
-          (int(1 + hmargin + height/8 - height/8 * math.cos(roll)),
-          int(1 + 3 * hmargin + 5*height/8 - height/8 * math.sin(roll))),
-          (int(1 + hmargin + height/8 + height/8 * math.cos(roll)),
-          int(1 + 3 * hmargin + 5*height/8 + height/8 * math.sin(roll))),
-         )
+
+        self.yaw_angle_plotter.plot(yaw)
+        self.pitch_angle_plotter.plot(pitch)
+        self.roll_angle_plotter.plot(roll)
+
+        self.yaw_scope_plotter.plot(yaw)
+        self.pitch_scope_plotter.plot(pitch)
+        self.roll_scope_plotter.plot(roll)
+
         self.g.draw()
