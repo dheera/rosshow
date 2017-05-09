@@ -61,55 +61,90 @@ class ImuViewer(object):
         self.rolls = [ 0. ] * 128
         self.rolls_p = 0
 
-        margin = self.g.shape[1]/16.
-        plotter_size = self.g.shape[1]/4.
-
-        self.yaw_angle_plotter = AnglePlotter(self.g,
-            xmin = margin,
-            ymin = margin,
-            xmax = margin + plotter_size,
-            ymax = margin + plotter_size,
-        )
+        hmargin = self.g.shape[0]/16.
+        vmargin = self.g.shape[1]/16.
+        hsize = (self.g.shape[0] - 4*hmargin ) / 3
+        vsize = (self.g.shape[1] - 4*vmargin ) / 3
 
         self.yaw_scope_plotter = ScopePlotter(self.g,
-            xmin = 2*margin + plotter_size,
-            ymin = margin,
-            xmax = self.g.shape[0]/2 - margin/2,
-            ymax = margin + plotter_size,
+            xmin = hmargin,
+            ymin = vmargin,
+            xmax = hmargin + hsize,
+            ymax = vmargin + vsize,
             vmin = -math.pi,
             vmax = math.pi,
         )
 
-        self.pitch_angle_plotter = AnglePlotter(self.g,
-            xmin = margin,
-            ymin = 2*margin + plotter_size,
-            xmax = margin + plotter_size,
-            ymax = 2*margin + 2*plotter_size,
-        )
-
         self.pitch_scope_plotter = ScopePlotter(self.g,
-            xmin = 2*margin + plotter_size,
-            ymin = 2*margin + plotter_size,
-            xmax = self.g.shape[0]/2 - margin/2,
-            ymax = 2*margin + 2*plotter_size,
+            xmin = hmargin,
+            ymin = 2*vmargin + vsize,
+            xmax = hmargin + hsize,
+            ymax = 2*vmargin + 2*vsize,
             vmin = -math.pi/2,
             vmax = math.pi/2,
         )
 
-        self.roll_angle_plotter = AnglePlotter(self.g,
-            xmin = margin,
-            ymin = 3*margin + 2*plotter_size,
-            xmax = margin + plotter_size,
-            ymax = 3*margin + 3*plotter_size,
-        )
-
         self.roll_scope_plotter = ScopePlotter(self.g,
-            xmin = 2*margin + plotter_size,
-            ymin = 3*margin + 2*plotter_size,
-            xmax = self.g.shape[0]/2 - margin/2,
-            ymax = 3*margin + 3*plotter_size,
+            xmin = hmargin,
+            ymin = 3*vmargin + 2*vsize,
+            xmax = hmargin + hsize,
+            ymax = 3*vmargin + 3*vsize,
             vmin = 0,
             vmax = 2*math.pi,
+        )
+
+        self.avx_scope_plotter = ScopePlotter(self.g,
+            xmin = 2*hmargin + hsize,
+            ymin = vmargin,
+            xmax = 2*hmargin + 2*hsize,
+            ymax = vmargin + vsize,
+            vmin = -math.pi,
+            vmax = math.pi,
+        )
+
+        self.avy_scope_plotter = ScopePlotter(self.g,
+            xmin = 2*hmargin + hsize,
+            ymin = 2*vmargin + vsize,
+            xmax = 2*hmargin + 2*hsize,
+            ymax = 2*vmargin + 2*vsize,
+            vmin = -math.pi,
+            vmax = math.pi,
+        )
+
+        self.avz_scope_plotter = ScopePlotter(self.g,
+            xmin = 2*hmargin + hsize,
+            ymin = 3*vmargin + 2*vsize,
+            xmax = 2*hmargin + 2*hsize,
+            ymax = 3*vmargin + 3*vsize,
+            vmin = -math.pi,
+            vmax = math.pi,
+        )
+
+        self.lax_scope_plotter = ScopePlotter(self.g,
+            xmin = 3*hmargin + 2*hsize,
+            ymin = vmargin,
+            xmax = 3*hmargin + 3*hsize,
+            ymax = vmargin + vsize,
+            vmin = -9.8,
+            vmax = 9.8,
+        )
+
+        self.lay_scope_plotter = ScopePlotter(self.g,
+            xmin = 3*hmargin + 2*hsize,
+            ymin = 2*vmargin + vsize,
+            xmax = 3*hmargin + 3*hsize,
+            ymax = 2*vmargin + 2*vsize,
+            vmin = -9.8,
+            vmax = 9.8
+        )
+
+        self.laz_scope_plotter = ScopePlotter(self.g,
+            xmin = 3*hmargin + 2*hsize,
+            ymin = 3*vmargin + 2*vsize,
+            xmax = 3*hmargin + 3*hsize,
+            ymax = 3*vmargin + 3*vsize,
+            vmin = -9.8,
+            vmax = 9.8,
         )
 
     def update(self, data):
@@ -124,12 +159,20 @@ class ImuViewer(object):
 
         self.g.clear()
 
-        self.yaw_angle_plotter.plot(yaw)
-        self.pitch_angle_plotter.plot(pitch)
-        self.roll_angle_plotter.plot(roll)
+        #self.yaw_angle_plotter.plot(yaw)
+        #self.pitch_angle_plotter.plot(pitch)
+        #self.roll_angle_plotter.plot(roll)
 
         self.yaw_scope_plotter.plot(yaw)
         self.pitch_scope_plotter.plot(pitch)
         self.roll_scope_plotter.plot(roll)
+
+        self.avx_scope_plotter.plot(data.angular_velocity.x)
+        self.avy_scope_plotter.plot(data.angular_velocity.y)
+        self.avz_scope_plotter.plot(data.angular_velocity.z)
+
+        self.lax_scope_plotter.plot(data.linear_acceleration.x)
+        self.lay_scope_plotter.plot(data.linear_acceleration.y)
+        self.laz_scope_plotter.plot(data.linear_acceleration.z)
 
         self.g.draw()
