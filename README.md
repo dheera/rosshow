@@ -13,4 +13,4 @@ Usage:
 
 ## Imu
 
-![screenshot](/screenshot0.png?raw=true "screenshot")
+![screenshot](/screenshot1.png?raw=true "screenshot")
