@@ -49,6 +49,7 @@ class TermGraphics(object):
         self.shape = (self.term_shape[0]*2, self.term_shape[1]*4)
         self.buffer = bytearray(self.term_shape[0]*self.term_shape[1])
         self.colors = bytearray(self.term_shape[0]*self.term_shape[1])
+        self.buffer_text = bytearray(self.term_shape[0]*self.term_shape[1])
         self.current_color = 7
         self.mode = mode
 
@@ -57,6 +58,8 @@ class TermGraphics(object):
         Clear the graphics buffer.
         """
         self.buffer = bytearray(self.term_shape[0]*self.term_shape[1])
+        self.colors = bytearray(self.term_shape[0]*self.term_shape[1])
+        self.buffer_text = bytearray(self.term_shape[0]*self.term_shape[1])
 
     def set_color(self, color):
         self.current_color = color
@@ -81,6 +84,16 @@ class TermGraphics(object):
             self.buffer[index] = self.buffer[index] | \
               UNICODE_BRAILLE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)]
             self.colors[index] = self.current_color
+
+    def text(self, text, point):
+        """
+        Draws text at point = (x0, y0).
+        """
+        text = text[0:self.term_shape[0]-point[1] >> 2]
+        index = ((point[0] >> 1) + (point[1] >> 2) * self.term_shape[0])
+        for i in range(len(text)):
+            self.buffer_text[index + i] = ord(text[i])
+            self.colors[index + i] = self.current_color
 
     def poly(self, points):
         """
@@ -159,10 +172,13 @@ class TermGraphics(object):
                 if self.colors[index] != current_draw_color:
                     current_draw_color = self.colors[index]
                     sys.stdout.write("\033[3" + str(current_draw_color) + "m")
-                if self.mode == MODE_BRAILLE:
-                    sys.stdout.write(unichr(0x2800 + self.buffer[index]))
-                elif self.mode == MODE_EASCII:
-                    sys.stdout.write(TABLE_EASCII[self.buffer[index]])
+                if self.buffer_text[index]:
+                    sys.stdout.write(chr(self.buffer_text[index]))
+                else:
+                    if self.mode == MODE_BRAILLE:
+                        sys.stdout.write(unichr(0x2800 + self.buffer[index]))
+                    elif self.mode == MODE_EASCII:
+                        sys.stdout.write(TABLE_EASCII[self.buffer[index]])
         sys.stdout.write("\033[37m")
         sys.stdout.flush()
 
@@ -174,5 +190,6 @@ if __name__ == '__main__':
         g.clear()
         for i in range(300):
             g.point((i, int(i*j/5)))
+        g.text("hello", (10, 10))
         g.draw()
         time.sleep(0.1)

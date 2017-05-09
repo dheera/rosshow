@@ -45,6 +45,8 @@ class ScopePlotter(object):
              (1 - (self.data[i] - self.vmin) / (self.vmax - self.vmin)) * (self.ymax - self.ymin) + self.ymin)
            )
         self.g.points(points)
+        self.g.text("{:2.4f}".format(self.vmax), (int(self.xmin), int(self.ymin)))
+        self.g.text("{:2.4f}".format(self.vmin), (int(self.xmin), int(self.ymax)))
         self.pointer = (self.pointer + 1) % len(self.data)
 
 class ImuViewer(object):
@@ -90,8 +92,8 @@ class ImuViewer(object):
             ymin = 2*margin + plotter_size,
             xmax = self.g.shape[0]/2 - margin/2,
             ymax = 2*margin + 2*plotter_size,
-            vmin = 0,
-            vmax = math.pi,
+            vmin = -math.pi/2,
+            vmax = math.pi/2,
         )
 
         self.roll_angle_plotter = AnglePlotter(self.g,
@@ -107,7 +109,7 @@ class ImuViewer(object):
             xmax = self.g.shape[0]/2 - margin/2,
             ymax = 3*margin + 3*plotter_size,
             vmin = 0,
-            vmax = math.pi,
+            vmax = 2*math.pi,
         )
 
     def update(self, data):
