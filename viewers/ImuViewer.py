@@ -19,35 +19,33 @@ class AnglePlotter(object):
         )
         self.g.line(
           (int(1 + self.xmin + (self.xmax - self.xmin)/2 - (self.xmax - self.xmin)/2*math.cos(angle)),
-          int(1 + self.ymin + (self.ymax - self.ymin)/2 - (self.ymax - self.ymin)/2*math.sin(angle))),
-          (int(1 + self.xmin + (self.xmax - self.xmin)/2 + (self.xmax - self.xmin)/2*math.cos(angle)),
           int(1 + self.ymin + (self.ymax - self.ymin)/2 + (self.ymax - self.ymin)/2*math.sin(angle))),
+          (int(1 + self.xmin + (self.xmax - self.xmin)/2 + (self.xmax - self.xmin)/2*math.cos(angle)),
+          int(1 + self.ymin + (self.ymax - self.ymin)/2 - (self.ymax - self.ymin)/2*math.sin(angle))),
         )
 
 class ScopePlotter(object):
-    def __init__(self, g, xmin = 0, xmax = 1, ymin = 0, ymax = 1, n = 128):
+    def __init__(self, g, xmin = 0, xmax = 1, ymin = 0, ymax = 1, vmin = -1, vmax = 1, n = 128):
         self.g = g
         self.xmin = xmin
         self.xmax = xmax
         self.ymin = ymin
         self.ymax = ymax
-        self.data_max = 0.0001
-        self.data_min = -0.0001
+        self.vmax = vmax
+        self.vmin = vmin
         self.data = [ 1. ] * n
         self.pointer = 0
 
     def plot(self, value):
         self.data[self.pointer] = value
-        self.pointer = (self.pointer + 1) % len(self.data)
-        self.data_max = max(self.data_max, max(self.data))
-        self.data_min = min(self.data_min, min(self.data))
         points = []
         for i in range(len(self.data)):
            points.append(
              (i/len(self.data)*(self.xmax - self.xmin) + self.xmin,
-             (self.data[i] - self.data_min) / (self.data_max - self.data_min) * (self.ymax - self.ymin) + self.ymin)
+             (1 - (self.data[i] - self.vmin) / (self.vmax - self.vmin)) * (self.ymax - self.ymin) + self.ymin)
            )
         self.g.points(points)
+        self.pointer = (self.pointer + 1) % len(self.data)
 
 class ImuViewer(object):
 
@@ -76,6 +74,8 @@ class ImuViewer(object):
             ymin = margin,
             xmax = self.g.shape[0]/2 - margin/2,
             ymax = margin + plotter_size,
+            vmin = -math.pi,
+            vmax = math.pi,
         )
 
         self.pitch_angle_plotter = AnglePlotter(self.g,
@@ -90,6 +90,8 @@ class ImuViewer(object):
             ymin = 2*margin + plotter_size,
             xmax = self.g.shape[0]/2 - margin/2,
             ymax = 2*margin + 2*plotter_size,
+            vmin = 0,
+            vmax = math.pi,
         )
 
         self.roll_angle_plotter = AnglePlotter(self.g,
@@ -104,6 +106,8 @@ class ImuViewer(object):
             ymin = 3*margin + 2*plotter_size,
             xmax = self.g.shape[0]/2 - margin/2,
             ymax = 3*margin + 3*plotter_size,
+            vmin = 0,
+            vmax = math.pi,
         )
 
     def update(self, data):
