@@ -23,6 +23,10 @@ COLOR_WHITE = 7
 MODE_BRAILLE = 0
 MODE_EASCII = 2
 
+IMAGE_MONOCHROME = 0
+IMAGE_UINT8 = 1
+IMAGE_RGB = 2
+
 TABLE_EASCII = " '-'.*.|'~/~/F//-\\-~/>-&'\"\"\"/)//.\\\\\\_LLL'\"<C-=CC:\\-\\vD=D|Y|Y|)AH.!i!.ii|/\"/F/Fff//rkfPrkJJ/P/P/P//>brr>kl>&&*=fF/)vb/PPDJ)19/2/R.\\\\\\\\\\\\(=T([(((C=3-5cSct!919|7Ce,\\\\\\_\\\\\\i919i9(C|)\\\\+tv\\|719|7@9_L=L_LLL_=6[CEC[=;==c2ctJ]d=¿Z6E/\\;bsbsbj]SSd=66jj]bddsbJ]j]d]d8"
 
 UNICODE_BRAILLE_MAP= [ \
@@ -123,14 +127,21 @@ class TermGraphics(object):
         self.line((point1[0], point1[1]), (point1[0], point0[1]))
         self.line((point1[0], point0[1]), (point0[0], point0[1]))
 
-    def image(self, image_data, point):
+    def image(self, data, width, height, point, image_type = IMAGE_MONOCHROME):
         """
         Draw a binary image with the top-left corner at point = (x0, y0).
         """
-        for i in image_data.shape[0]:
-            for j in image_data.shape[1]:
-                if image_data[i, j] > 0:
-                    self.point(point[0] + i, point[1] + j)
+        if image_type == IMAGE_MONOCHROME:
+            for i in range(width):
+                for j in range(height):
+                    if data[j*width + i] > 0:
+                        self.point((point[0] + i, point[1] + j))
+
+        elif image_type == IMAGE_UINT8:
+            for i in range(width):
+                for j in range(height):
+                    if data[j*width + i] > 127:
+                        self.point((point[0] + i, point[1] + j))
 
     def draw(self):
         """
