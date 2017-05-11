@@ -71,6 +71,24 @@ class TermGraphics(object):
         for point in points:
             self.point(point)
 
+    def erase(self, point, block = False):
+        """
+        Erases a point. Erases the entire character block
+        if block is True (useful for drawing bright points on a dark
+        background).
+        """
+        if type(point[0]) is not int or type(point[1]) is not int:
+            point = (int(point[0]), int(point[1]))
+
+        if point[0] >= 0 and point[1] >= 0 and point[0] < self.shape[0] and point[1] < self.shape[1]:
+            index = ((point[0] >> 1) + (point[1] >> 2) * self.term_shape[0])
+
+            if block:
+                self.buffer[index] = 0
+            else:
+                self.buffer[index] = self.buffer[index] & \
+                  (0xFF ^ UNICODE_BRAILLE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)])
+
     def point(self, point):
         """
         Draw a point at points = (x,y) where x is the column number, y is the row number, and (0,0)

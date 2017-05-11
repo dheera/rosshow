@@ -61,8 +61,8 @@ class ImuViewer(object):
         self.rolls = [ 0. ] * 128
         self.rolls_p = 0
 
-        hmargin = self.g.shape[0]/16.
-        vmargin = self.g.shape[1]/16.
+        hmargin = self.g.shape[0]/40.
+        vmargin = self.g.shape[1]/20.
         hsize = (self.g.shape[0] - 4*hmargin ) / 3
         vsize = (self.g.shape[1] - 4*vmargin ) / 3
 

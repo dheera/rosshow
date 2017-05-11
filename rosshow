@@ -8,6 +8,9 @@ import time
 from viewers.ImuViewer import ImuViewer
 from sensor_msgs.msg import Imu
 
+from viewers.NavSatFixViewer import NavSatFixViewer
+from sensor_msgs.msg import NavSatFix
+
 from viewers.PointCloud2Viewer import PointCloud2Viewer
 from sensor_msgs.msg import PointCloud2
 
@@ -32,6 +35,11 @@ if __name__ == "__main__":
     if topics[TOPIC] == 'sensor_msgs/Imu':
         viewer = ImuViewer()
         rospy.Subscriber(TOPIC, Imu, viewer.update)
+        rospy.spin()
+
+    if topics[TOPIC] == 'sensor_msgs/NavSatFix':
+        viewer = NavSatFixViewer()
+        rospy.Subscriber(TOPIC, NavSatFix, viewer.update)
         rospy.spin()
 
     else:
