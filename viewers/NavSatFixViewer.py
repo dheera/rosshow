@@ -55,7 +55,7 @@ class LocationPlotter(object):
 
         self.g.clear()
 
-        self.g.set_color(termgraphics.COLOR_BLACK)
+        self.g.set_color(termgraphics.COLOR_BLUE)
 
         img = img.resize((width, height), Image.NEAREST)
         self.g.image(list(img.getdata()), img.width, img.height, (0, 0), image_type = termgraphics.IMAGE_UINT8)
