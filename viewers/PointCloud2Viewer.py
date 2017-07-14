@@ -7,8 +7,8 @@ from .termgraphics import TermGraphics
 class PointCloud2Viewer(object):
     def __init__(self):
         self.g = TermGraphics()
-        self.xmax = 10
-        self.ymax = 10
+        self.xmax = 20
+        self.ymax = 20
 
     def update(self, data):
         points = list(pcl2.read_points(data))
