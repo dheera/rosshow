@@ -14,8 +14,8 @@ from sensor_msgs.msg import NavSatFix
 from viewers.PointCloud2Viewer import PointCloud2Viewer
 from sensor_msgs.msg import PointCloud2
 
-from viewers.LaserScanViewer import LaserScanViewer
-from sensor_msgs.msg import LaserScan
+from viewers.ImageViewer import ImageViewer
+from sensor_msgs.msg import Image
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
@@ -35,11 +35,6 @@ if __name__ == "__main__":
         rospy.Subscriber(TOPIC, PointCloud2, viewer.update)
         rospy.spin()
 
-    if topics[TOPIC] == 'sensor_msgs/LaserScan':
-        viewer = LaserScanViewer()
-        rospy.Subscriber(TOPIC, LaserScan, viewer.update)
-        rospy.spin()
-
     if topics[TOPIC] == 'sensor_msgs/Imu':
         viewer = ImuViewer()
         rospy.Subscriber(TOPIC, Imu, viewer.update)
@@ -48,6 +43,11 @@ if __name__ == "__main__":
     if topics[TOPIC] == 'sensor_msgs/NavSatFix':
         viewer = NavSatFixViewer()
         rospy.Subscriber(TOPIC, NavSatFix, viewer.update)
+        rospy.spin()
+
+    if topics[TOPIC] == 'sensor_msgs/Image':
+        viewer = ImageViewer()
+        rospy.Subscriber(TOPIC, Image, viewer.update)
         rospy.spin()
 
     else:
