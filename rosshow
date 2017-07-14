@@ -35,17 +35,17 @@ if __name__ == "__main__":
         rospy.Subscriber(TOPIC, PointCloud2, viewer.update)
         rospy.spin()
 
-    if topics[TOPIC] == 'sensor_msgs/Imu':
+    elif topics[TOPIC] == 'sensor_msgs/Imu':
         viewer = ImuViewer()
         rospy.Subscriber(TOPIC, Imu, viewer.update)
         rospy.spin()
 
-    if topics[TOPIC] == 'sensor_msgs/NavSatFix':
+    elif topics[TOPIC] == 'sensor_msgs/NavSatFix':
         viewer = NavSatFixViewer()
         rospy.Subscriber(TOPIC, NavSatFix, viewer.update)
         rospy.spin()
 
-    if topics[TOPIC] == 'sensor_msgs/Image':
+    elif topics[TOPIC] == 'sensor_msgs/Image':
         viewer = ImageViewer()
         rospy.Subscriber(TOPIC, Image, viewer.update)
         rospy.spin()
