@@ -24,6 +24,9 @@ class ImageViewer(object):
             current_image = numpy.fromstring(data.data, numpy.uint8).reshape((data.height, data.width, 3))[:, :, ::-1]
         elif data.encoding == 'rgb8':
             current_image = numpy.fromstring(data.data, numpy.uint8).reshape((data.height, data.width, 3))
+        else:
+            print("Image encoding not supported yet.")
+            return
 
         ratio = data.width / data.height
         if w/h >= ratio:
