@@ -87,6 +87,8 @@ class TermGraphics(object):
         """
         for point in points:
             self.point(point, clear_block = clear_block)
+        for point in points:
+            self.point(point, clear_block = False)
 
     def point(self, point, clear_block = False):
         """
