@@ -14,6 +14,9 @@ from sensor_msgs.msg import NavSatFix
 from viewers.PointCloud2Viewer import PointCloud2Viewer
 from sensor_msgs.msg import PointCloud2
 
+from viewers.LaserScanViewer import LaserScanViewer
+from sensor_msgs.msg import LaserScan
+
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
         print("Usage: rosshow <topic>")
@@ -30,6 +33,11 @@ if __name__ == "__main__":
     if topics[TOPIC] == 'sensor_msgs/PointCloud2':
         viewer = PointCloud2Viewer()
         rospy.Subscriber(TOPIC, PointCloud2, viewer.update)
+        rospy.spin()
+
+    if topics[TOPIC] == 'sensor_msgs/LaserScan':
+        viewer = LaserScanViewer()
+        rospy.Subscriber(TOPIC, LaserScan, viewer.update)
         rospy.spin()
 
     if topics[TOPIC] == 'sensor_msgs/Imu':
