@@ -68,15 +68,13 @@ class LocationPlotter(object):
                height * (self.data[i][0] - lat_min) / (lat_max - lat_min)
            ))
         self.g.set_color(termgraphics.COLOR_WHITE)
-        for point in points:
-            self.g.erase(point, block = True)
 
-        self.g.points(points)
+        self.g.points(points, clear_block = True)
         self.g.set_color(termgraphics.COLOR_RED)
         self.g.point((
            width * (self.data[self.pointer][1] - lon_min) / (lon_max - lon_min),
            height * (self.data[self.pointer][0] - lat_min) / (lat_max - lat_min)
-        ))
+        ), clear_block = True)
         self.pointer = (self.pointer + 1) % len(self.data)
 
 class NavSatFixViewer(object):
