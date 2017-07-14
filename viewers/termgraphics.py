@@ -37,7 +37,7 @@ IMAGE_RGB_2X4 = 2
 
 TABLE_EASCII = " '-'.*.|'~/~/F//-\\-~/>-&'\"\"\"/)//.\\\\\\_LLL'\"<C-=CC:\\-\\vD=D|Y|Y|)AH.!i!.ii|/\"/F/Fff//rkfPrkJJ/P/P/P//>brr>kl>&&*=fF/)vb/PPDJ)19/2/R.\\\\\\\\\\\\(=T([(((C=3-5cSct!919|7Ce,\\\\\\_\\\\\\i919i9(C|)\\\\+tv\\|719|7@9_L=L_LLL_=6[CEC[=;==c2ctJ]d=¿Z6E/\\;bsbsbj]SSd=66jj]bddsbJ]j]d]d8"
 
-UNICODE_UNICODE_MAP= [ \
+UNICODE_BRAILLE_MAP= [ \
     0b00000001,
     0b00001000,
     0b00000010,
@@ -102,10 +102,10 @@ class TermGraphics(object):
             index = ((point[0] >> 1) + (point[1] >> 2) * self.term_shape[0])
             self.buffer[2*index] = 0x28
             if clear_block:
-                self.buffer[2*index+1] = UNICODE_UNICODE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)]
+                self.buffer[2*index+1] = UNICODE_BRAILLE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)]
             else:
                 self.buffer[2*index+1] = self.buffer[2*index+1] | \
-                  UNICODE_UNICODE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)]
+                  UNICODE_BRAILLE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)]
             self.colors[3*index:3*index+3] = self.current_color
 
     def text(self, text, point):
