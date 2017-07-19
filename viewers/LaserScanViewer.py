@@ -16,7 +16,7 @@ class LaserScanViewer(object):
         h = self.g.shape[1]
         self.ymax = self.xmax * h/w
         for n in range(len(data.ranges)):
-            if data.ranges[n] == math.inf:
+            if math.isinf(data.ranges[n]) or math.isnan(data.ranges[n]):
                 continue
             x = data.ranges[n]*math.cos(data.angle_min + n*data.angle_increment)
             y = data.ranges[n]*math.sin(data.angle_min + n*data.angle_increment)
