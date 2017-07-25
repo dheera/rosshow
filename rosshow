@@ -17,6 +17,9 @@ from sensor_msgs.msg import PointCloud2
 from viewers.ImageViewer import ImageViewer
 from sensor_msgs.msg import Image
 
+from viewers.LaserScanViewer import LaserScanViewer
+from sensor_msgs.msg import LaserScan
+
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
         print("Usage: rosshow <topic>")
@@ -35,6 +38,11 @@ if __name__ == "__main__":
         rospy.Subscriber(TOPIC, PointCloud2, viewer.update)
         rospy.spin()
 
+    elif topics[TOPIC] == 'sensor_msgs/LaserScan':
+        viewer = LaserScanViewer()
+        rospy.Subscriber(TOPIC, LaserScan, viewer.update)
+        rospy.spin()
+            
     elif topics[TOPIC] == 'sensor_msgs/Imu':
         viewer = ImuViewer()
         rospy.Subscriber(TOPIC, Imu, viewer.update)
