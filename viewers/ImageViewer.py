@@ -21,11 +21,17 @@ class ImageViewer(object):
         w = self.g.shape[0]
         h = self.g.shape[1]
         if data.encoding == 'bgr8':
-            current_image = numpy.fromstring(data.data, numpy.uint8).reshape((data.height, data.width, 3))[:, :, ::-1]
+            current_image = numpy.frombuffer(data.data, numpy.uint8).reshape((data.height, data.width, 3))[:, :, ::-1]
         elif data.encoding == 'rgb8':
-            current_image = numpy.fromstring(data.data, numpy.uint8).reshape((data.height, data.width, 3))
+            current_image = numpy.frombuffer(data.data, numpy.uint8).reshape((data.height, data.width, 3))
+        elif data.encoding == '8UC1':
+            current_image = numpy.frombuffer(data.data, numpy.uint8).reshape((data.height, data.width))
+            current_image = numpy.array((current_image.T, current_image.T, current_image.T)).T
         elif data.encoding == '16UC1':
-            current_image = numpy.fromstring(data.data, numpy.uint16).reshape((data.height, data.width))
+            current_image = numpy.frombuffer(data.data, numpy.uint16).reshape((data.height, data.width)).astype(numpy.float)
+            current_image_max = numpy.percentile(current_image, 96)
+            current_image_min = numpy.percentile(current_image, 4)
+            current_image = (255*(1 - current_image - current_image_min)/(current_image_max - current_image_min)).astype(numpy.uint8)
             current_image = numpy.array((current_image.T, current_image.T, current_image.T)).T
         else:
             print("Image encoding " + data.encoding + " not supported yet.")
