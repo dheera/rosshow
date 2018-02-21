@@ -4,6 +4,7 @@ import os
 import rospy
 import sys
 import time
+import random
 
 from viewers.ImuViewer import ImuViewer
 from sensor_msgs.msg import Imu
@@ -31,7 +32,7 @@ if __name__ == "__main__":
         print("Topic {0} does not appear to be published yet.".format(TOPIC))
         sys.exit(0)
 
-    rospy.init_node('rosshow')
+    rospy.init_node('rosshow_' + str(random.randint(10000,99999)))
 
     if topics[TOPIC] == 'sensor_msgs/PointCloud2':
         viewer = PointCloud2Viewer()
