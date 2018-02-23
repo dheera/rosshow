@@ -24,10 +24,10 @@ class ImageViewer(object):
             current_image = numpy.frombuffer(data.data, numpy.uint8).reshape((data.height, data.width, 3))[:, :, ::-1]
         elif data.encoding == 'rgb8':
             current_image = numpy.frombuffer(data.data, numpy.uint8).reshape((data.height, data.width, 3))
-        elif data.encoding == '8UC1':
+        elif data.encoding == 'mono8' or data.encoding == '8UC1':
             current_image = numpy.frombuffer(data.data, numpy.uint8).reshape((data.height, data.width))
             current_image = numpy.array((current_image.T, current_image.T, current_image.T)).T
-        elif data.encoding == '16UC1':
+        elif data.encoding == 'mono16' or data.encoding == '16UC1':
             current_image = numpy.frombuffer(data.data, numpy.uint16).reshape((data.height, data.width)).astype(numpy.float)
             current_image_max = numpy.percentile(current_image, 95)
             current_image_min = numpy.percentile(current_image, 5)
