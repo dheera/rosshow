@@ -2,7 +2,7 @@
 
 import sensor_msgs.point_cloud2 as pcl2
 
-from .termgraphics import TermGraphics
+import librosshow.termgraphics as TermGraphics
 
 class PointCloud2Viewer(object):
     def __init__(self):

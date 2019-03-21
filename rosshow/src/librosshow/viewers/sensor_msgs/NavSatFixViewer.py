@@ -6,7 +6,7 @@ from io import BytesIO
 import math
 import requests
 import time
-from . import termgraphics
+import librosshow.termgraphics as termgraphics
 
 @functools.lru_cache()
 def get_tile(xtile, ytile, zoom):

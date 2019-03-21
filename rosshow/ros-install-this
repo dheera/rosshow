@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Installs a single ROS package from the package directory
+# without needing to manually create a workspace.
+
+# Usage:
+#   ros-install-this
+
+ROSDISTRO=`ls /opt/ros | head -1`
+
+if [ -f 'package.xml' ]
+
+then
+
+TMPFILE=$(mktemp -d /tmp/ros-install-this.XXXXXX)
+PACKAGENAME=`cat package.xml |grep '<name>' | sed -e 's/^.*<name>\(.*\)<\/name>.*$/\1/'`
+mkdir -p $TMPFILE/src/
+cp -rv . $TMPFILE/src/$PACKAGENAME
+source /opt/ros/$ROSDISTRO/setup.bash
+cd $TMPFILE/src/
+catkin_init_workspace
+cd $TMPFILE/
+catkin_make
+sudo bash -c "source /opt/ros/$ROSDISTRO/setup.bash; catkin_make install -DCMAKE_INSTALL_PREFIX=/opt/ros/$ROSDISTRO"
+rm -rf $TMPFILE
+
+else
+
+echo "Error: This directory does not appear to be a ROS package."
+
+fi

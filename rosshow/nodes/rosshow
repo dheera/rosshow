@@ -6,19 +6,19 @@ import sys
 import time
 import random
 
-from viewers.ImuViewer import ImuViewer
+from librosshow.viewers.sensor_msgs.ImuViewer import ImuViewer
 from sensor_msgs.msg import Imu
 
-from viewers.NavSatFixViewer import NavSatFixViewer
+from librosshow.viewers.sensor_msgs.NavSatFixViewer import NavSatFixViewer
 from sensor_msgs.msg import NavSatFix
 
-from viewers.PointCloud2Viewer import PointCloud2Viewer
+from librosshow.viewers.sensor_msgs.PointCloud2Viewer import PointCloud2Viewer
 from sensor_msgs.msg import PointCloud2
 
-from viewers.ImageViewer import ImageViewer
+from librosshow.viewers.sensor_msgs.ImageViewer import ImageViewer
 from sensor_msgs.msg import Image
 
-from viewers.LaserScanViewer import LaserScanViewer
+from librosshow.viewers.sensor_msgs.LaserScanViewer import LaserScanViewer
 from sensor_msgs.msg import LaserScan
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ import numpy
 import time
 import scipy.misc
 
-from . import termgraphics
+import librosshow.termgraphics as termgraphics
 
 class ImageViewer(object):
     def __init__(self):
@@ -39,14 +39,15 @@ class ImageViewer(object):
             return
 
         ratio = data.width / data.height
-        if w/h >= ratio:
+        if w/h * 4/2>= ratio:
            w = h * ratio
         else:
            h = w / ratio
 
-        w = int(w/7)
+        w = int(w/4)
         h = int(h/2)
-
+        #w = int(w/7)
+        #h = int(h/2)
         resized_image = list(map(tuple, scipy.misc.imresize(current_image, (w, h)).reshape((w*h, 3))))
 
         self.g.image(resized_image, h, w, (0, 0), image_type = termgraphics.IMAGE_RGB_2X4)

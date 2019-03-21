@@ -2,11 +2,11 @@
 
 import math
 
-from .termgraphics import TermGraphics
+import librosshow.termgraphics as termgraphics
 
 class LaserScanViewer(object):
     def __init__(self):
-        self.g = TermGraphics()
+        self.g = termgraphics.TermGraphics()
         self.xmax = 10
         self.ymax = 10
 

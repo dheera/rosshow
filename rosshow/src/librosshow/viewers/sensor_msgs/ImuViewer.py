@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import math
-from .termgraphics import TermGraphics
+import librosshow.termgraphics as termgraphics
 
 class AnglePlotter(object):
     def __init__(self, g, xmin = 0, xmax = 1, ymin = 0, ymax = 1):
@@ -52,7 +52,7 @@ class ScopePlotter(object):
 class ImuViewer(object):
 
     def __init__(self):
-        self.g = TermGraphics()
+        self.g = termgraphics.TermGraphics()
         self.xmax = 10
         self.yaws = [ 0. ] * 128
         self.yaws_p = 0
