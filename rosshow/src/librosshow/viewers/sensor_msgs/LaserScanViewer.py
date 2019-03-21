@@ -9,18 +9,26 @@ class LaserScanViewer(object):
         self.g = termgraphics.TermGraphics()
         self.xmax = 10
         self.ymax = 10
+        self.msg = None
 
-    def update(self, data):
+    def update(self, msg):
+        self.msg = msg
+
+    def draw(self):
+        if not self.msg:
+            return
+
         self.g.clear()
         w = self.g.shape[0]
         h = self.g.shape[1]
         self.ymax = self.xmax * h/w
-        for n in range(len(data.ranges)):
-            if math.isinf(data.ranges[n]) or math.isnan(data.ranges[n]):
+        for n in range(len(self.msg.ranges)):
+            if math.isinf(self.msg.ranges[n]) or math.isnan(self.msg.ranges[n]):
                 continue
-            x = data.ranges[n]*math.cos(data.angle_min + n*data.angle_increment)
-            y = data.ranges[n]*math.sin(data.angle_min + n*data.angle_increment)
+            x = self.msg.ranges[n]*math.cos(self.msg.angle_min + n*self.msg.angle_increment)
+            y = self.msg.ranges[n]*math.sin(self.msg.angle_min + n*self.msg.angle_increment)
             i = int(w * (x + self.xmax) / (2 * self.xmax))
             j = int(h * (1 - (y + self.ymax) / (2 * self.ymax)))
-            self.g.point((i,j))
+            self.g.point((i, j))
+
         self.g.draw()

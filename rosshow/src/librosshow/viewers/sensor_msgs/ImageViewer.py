@@ -12,33 +12,37 @@ class ImageViewer(object):
         self.xmax = 20
         self.ymax = 20
         self.last_update_time = 0
+        self.image = None
 
-    def update(self, data):
-        if time.time() - self.last_update_time < 0.075:
+    def update(self, msg):
+        self.image = msg
+
+    def draw(self):
+        if not self.image:
             return
 
         self.g.clear()
         w = self.g.shape[0]
         h = self.g.shape[1]
-        if data.encoding == 'bgr8':
-            current_image = numpy.frombuffer(data.data, numpy.uint8).reshape((data.height, data.width, 3))[:, :, ::-1]
-        elif data.encoding == 'rgb8':
-            current_image = numpy.frombuffer(data.data, numpy.uint8).reshape((data.height, data.width, 3))
-        elif data.encoding == 'mono8' or data.encoding == '8UC1':
-            current_image = numpy.frombuffer(data.data, numpy.uint8).reshape((data.height, data.width))
+        if self.image.encoding == 'bgr8':
+            current_image = numpy.frombuffer(self.image.data, numpy.uint8).reshape((self.image.height, self.image.width, 3))[:, :, ::-1]
+        elif self.image.encoding == 'rgb8':
+            current_image = numpy.frombuffer(self.image.data, numpy.uint8).reshape((self.image.height, self.image.width, 3))
+        elif self.image.encoding == 'mono8' or self.image.encoding == '8UC1':
+            current_image = numpy.frombuffer(self.image.data, numpy.uint8).reshape((self.image.height, self.image.width))
             current_image = numpy.array((current_image.T, current_image.T, current_image.T)).T
-        elif data.encoding == 'mono16' or data.encoding == '16UC1':
-            current_image = numpy.frombuffer(data.data, numpy.uint16).reshape((data.height, data.width)).astype(numpy.float)
+        elif self.image.encoding == 'mono16' or self.image.encoding == '16UC1':
+            current_image = numpy.frombuffer(self.image.data, numpy.uint16).reshape((self.image.height, self.image.width)).astype(numpy.float)
             current_image_max = numpy.percentile(current_image, 95)
             current_image_min = numpy.percentile(current_image, 5)
             current_image = 255*((current_image - current_image_min)/(current_image_max - current_image_min))
             current_image = numpy.clip(current_image, 0, 255) #.astype(numpy.uint8)
             current_image = numpy.array((current_image.T, current_image.T, current_image.T)).T
         else:
-            print("Image encoding " + data.encoding + " not supported yet.")
+            print("Image encoding " + self.image.encoding + " not supported yet.")
             return
 
-        ratio = data.width / data.height
+        ratio = self.image.height / self.image.width
         if w/h * 4/2>= ratio:
            w = h * ratio
         else:

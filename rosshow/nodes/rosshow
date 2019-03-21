@@ -53,5 +53,9 @@ if __name__ == "__main__":
     message_class = getattr(__import__(message_package + ".msg", fromlist=(message_name)), message_name)
 
     rospy.Subscriber(TOPIC, message_class, viewer.update)
-    rospy.spin()
+
+    rate = rospy.Rate(15)
+    while not rospy.is_shutdown():
+        rate.sleep()
+        viewer.draw()
 

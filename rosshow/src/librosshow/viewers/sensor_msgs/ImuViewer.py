@@ -111,18 +111,25 @@ class ImuViewer(object):
         pitch = math.asin(2*(a*c-b*d))
         roll = math.atan2(2*a*d+2*b*c, 1-2*c*c-2*d*d)+math.pi
 
+        self.yaw_scope_plotter.update(yaw)
+        self.pitch_scope_plotter.update(pitch)
+        self.roll_scope_plotter.update(roll)
+        self.avx_scope_plotter.update(data.angular_velocity.x)
+        self.avy_scope_plotter.update(data.angular_velocity.y)
+        self.avz_scope_plotter.update(data.angular_velocity.z)
+        self.lax_scope_plotter.update(data.linear_acceleration.x)
+        self.lay_scope_plotter.update(data.linear_acceleration.y)
+        self.laz_scope_plotter.update(data.linear_acceleration.z)
+
+    def draw(self):
         self.g.clear()
-
-        self.yaw_scope_plotter.plot(yaw)
-        self.pitch_scope_plotter.plot(pitch)
-        self.roll_scope_plotter.plot(roll)
-
-        self.avx_scope_plotter.plot(data.angular_velocity.x)
-        self.avy_scope_plotter.plot(data.angular_velocity.y)
-        self.avz_scope_plotter.plot(data.angular_velocity.z)
-
-        self.lax_scope_plotter.plot(data.linear_acceleration.x)
-        self.lay_scope_plotter.plot(data.linear_acceleration.y)
-        self.laz_scope_plotter.plot(data.linear_acceleration.z)
-
+        self.yaw_scope_plotter.plot()
+        self.pitch_scope_plotter.plot()
+        self.roll_scope_plotter.plot()
+        self.avx_scope_plotter.plot()
+        self.avy_scope_plotter.plot()
+        self.avz_scope_plotter.plot()
+        self.lax_scope_plotter.plot()
+        self.lay_scope_plotter.plot()
+        self.laz_scope_plotter.plot()
         self.g.draw()

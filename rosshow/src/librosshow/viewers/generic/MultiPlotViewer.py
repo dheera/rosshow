@@ -25,10 +25,7 @@ class SinglePlotViewer(object):
         )
 
     def update(self, msg):
-        self.scope_plotter.update(float(msg.data))
 
-    def draw(self):
         self.g.clear()
-        self.scope_plotter.plot()
+        self.scope_plotter.plot(float(msg.data))
         self.g.draw()
-

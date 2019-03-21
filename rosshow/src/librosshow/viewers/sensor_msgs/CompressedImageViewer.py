@@ -21,16 +21,20 @@ class CompressedImageViewer(object):
         self.xmax = 20
         self.ymax = 20
         self.last_update_time = 0
+        self.msg = None
 
-    def update(self, data):
-        if time.time() - self.last_update_time < 0.075:
+    def update(self, msg):
+        self.msg = msg
+
+    def draw(self):
+        if not self.msg:
             return
 
         self.g.clear()
         w = self.g.shape[0]
         h = self.g.shape[1]
 
-        current_image_obj = PIL.Image.open(io.BytesIO(data.data))
+        current_image_obj = PIL.Image.open(io.BytesIO(self.msg.data))
 
         current_image = np.fromstring(current_image_obj.tobytes(), dtype=np.uint8)
         current_image = current_image.reshape((current_image_obj.size[1], current_image_obj.size[0], 3))    

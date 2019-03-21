@@ -40,8 +40,11 @@ class LocationPlotter(object):
         self.data = [ (0,0) ] * n
         self.pointer = 0
 
-    def plot(self, value):
+    def update(self, value):
+        self.pointer = (self.pointer + 1) % len(self.data)
         self.data[self.pointer] = value
+
+    def draw(self):
         lat_point = self.data[self.pointer][0]
         lon_point = self.data[self.pointer][1]
         width = self.g.shape[0]
@@ -75,7 +78,6 @@ class LocationPlotter(object):
            width * (self.data[self.pointer][1] - lon_min) / (lon_max - lon_min),
            height * (self.data[self.pointer][0] - lat_min) / (lat_max - lat_min)
         ), clear_block = True)
-        self.pointer = (self.pointer + 1) % len(self.data)
 
 class NavSatFixViewer(object):
 
@@ -84,7 +86,8 @@ class NavSatFixViewer(object):
         self.location_plotter = LocationPlotter(self.g)
 
     def update(self, data):
+        self.location_plotter.update((data.latitude, data.longitude))
 
-        self.location_plotter.plot((data.latitude, data.longitude))
-
+    def draw(self):
+        self.location_plotter.draw()
         self.g.draw()

@@ -7,18 +7,22 @@ class AnglePlotter(object):
         self.right = right
         self.top = top
         self.bottom = bottom
+        self.angle = 0
 
-    def plot(self, angle):
+    def update(self, angle):
+        self.angle = angle
+
+    def plot(self):
         width, height = self.g.shape
         self.g.rect(
           (int(self.left), int(self.top)),
           (int(self.right), int(self.bottom)),
         )
         self.g.line(
-          (int(1 + self.left + (self.right - self.left)/2 - (self.right - self.left)/2*math.cos(angle)),
-          int(1 + self.top + (self.bottom - self.top)/2 + (self.bottom - self.top)/2*math.sin(angle))),
-          (int(1 + self.left + (self.right - self.left)/2 + (self.right - self.left)/2*math.cos(angle)),
-          int(1 + self.top + (self.bottom - self.top)/2 - (self.bottom - self.top)/2*math.sin(angle))),
+          (int(1 + self.left + (self.right - self.left)/2 - (self.right - self.left)/2*math.cos(self.angle)),
+          int(1 + self.top + (self.bottom - self.top)/2 + (self.bottom - self.top)/2*math.sin(self.angle))),
+          (int(1 + self.left + (self.right - self.left)/2 + (self.right - self.left)/2*math.cos(self.angle)),
+          int(1 + self.top + (self.bottom - self.top)/2 - (self.bottom - self.top)/2*math.sin(self.angle))),
         )
 
 class ScopePlotter(object):
@@ -43,8 +47,11 @@ class ScopePlotter(object):
         if abslogscale % 3 == 2:
             return np.sign(value) * (50 ** ((abslogscale - 2) / 3))
 
-    def plot(self, value):
+    def update(self, value):
         self.data[self.pointer] = value
+        self.pointer = (self.pointer + 1) % len(self.data)
+
+    def plot(self):
         points = []
 
         ymin = self.ymin
@@ -68,5 +75,4 @@ class ScopePlotter(object):
         self.g.text("{:2.4f}".format(ymax), (int(self.left), int(self.top)))
         self.g.text("{:2.4f}".format((ymax + ymin)/2), (int(self.left), int(self.top + (self.bottom - self.top) / 2 )))
         self.g.text("{:2.4f}".format(ymin), (int(self.left), int(self.bottom)))
-        self.pointer = (self.pointer + 1) % len(self.data)
 
