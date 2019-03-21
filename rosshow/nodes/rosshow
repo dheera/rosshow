@@ -5,21 +5,17 @@ import rospy
 import sys
 import time
 import random
-
-from librosshow.viewers.sensor_msgs.ImuViewer import ImuViewer
-from sensor_msgs.msg import Imu
-
-from librosshow.viewers.sensor_msgs.NavSatFixViewer import NavSatFixViewer
-from sensor_msgs.msg import NavSatFix
-
-from librosshow.viewers.sensor_msgs.PointCloud2Viewer import PointCloud2Viewer
-from sensor_msgs.msg import PointCloud2
-
-from librosshow.viewers.sensor_msgs.ImageViewer import ImageViewer
 from sensor_msgs.msg import Image
 
 from librosshow.viewers.sensor_msgs.LaserScanViewer import LaserScanViewer
 from sensor_msgs.msg import LaserScan
+
+VIEWER_MAPPING = {
+  "sensor_msgs/LaserScan": ("librosshow.viewers.sensor_msgs.LaserScanViewer", "LaserScanViewer"),
+  "sensor_msgs/Imu": ("librosshow.viewers.sensor_msgs.ImuViewer", "ImuViewer"),
+  "sensor_msgs/Image": ("librosshow.viewers.sensor_msgs.ImageViewer", "ImageViewer"),
+  "sensor_msgs/NavSatFix": ("librosshow.viewers.sensor_msgs.NavSatFixViewer", "NavSatFixViewer"),
+}
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
@@ -27,37 +23,24 @@ if __name__ == "__main__":
         sys.exit(0)
 
     TOPIC = sys.argv[1]
-    topics = dict(rospy.get_published_topics())
-    if TOPIC not in topics:
+    topic_types = dict(rospy.get_published_topics())
+    if TOPIC not in topic_types:
         print("Topic {0} does not appear to be published yet.".format(TOPIC))
         sys.exit(0)
 
     rospy.init_node('rosshow_' + str(random.randint(10000,99999)))
 
-    if topics[TOPIC] == 'sensor_msgs/PointCloud2':
-        viewer = PointCloud2Viewer()
-        rospy.Subscriber(TOPIC, PointCloud2, viewer.update)
-        rospy.spin()
+    if topic_types[TOPIC] not in VIEWER_MAPPING:
+        print("Unsupported message type.")
+        exit()
 
-    elif topics[TOPIC] == 'sensor_msgs/LaserScan':
-        viewer = LaserScanViewer()
-        rospy.Subscriber(TOPIC, LaserScan, viewer.update)
-        rospy.spin()
-            
-    elif topics[TOPIC] == 'sensor_msgs/Imu':
-        viewer = ImuViewer()
-        rospy.Subscriber(TOPIC, Imu, viewer.update)
-        rospy.spin()
+    module_name, class_name = VIEWER_MAPPING[topic_types[TOPIC]]
+    viewer_class = getattr(__import__(module_name, fromlist=(class_name)), class_name)
+    viewer = viewer_class()
 
-    elif topics[TOPIC] == 'sensor_msgs/NavSatFix':
-        viewer = NavSatFixViewer()
-        rospy.Subscriber(TOPIC, NavSatFix, viewer.update)
-        rospy.spin()
+    message_package, message_name = topic_types[TOPIC].split("/", 2)
+    message_class = getattr(__import__(message_package + ".msg", fromlist=(message_name)), message_name)
 
-    elif topics[TOPIC] == 'sensor_msgs/Image':
-        viewer = ImageViewer()
-        rospy.Subscriber(TOPIC, Image, viewer.update)
-        rospy.spin()
+    rospy.Subscriber(TOPIC, message_class, viewer.update)
+    rospy.spin()
 
-    else:
-        print("Topic type not supported")
