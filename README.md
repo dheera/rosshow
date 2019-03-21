@@ -2,10 +2,19 @@
 
 Displays various sensor messages in a useful fashion using Unicode Braille art in the terminal so you don't need to fire up rviz. Currently very preliminary (pre-pre-pre-alpha) with many more features and data types to come.
 
-Usage:
+# Installation
+```
+cd rosshow
+source /opt/ros/kinetic/setup.bash
+./ros-install-this
+```
+
+# Usage
 ```
 ./rosshow <topicname>
 ```
+
+# Screenshots
 
 ## sensor_msgs/LaserScan and sensor_msgs/PointCloud2
 

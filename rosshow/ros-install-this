@@ -1,31 +1,44 @@
 #!/bin/bash
 
-# Installs a single ROS package from the package directory
-# without needing to manually create a workspace.
+# Directly installs a single ROS package from the package directory
+# to ROS_ROOT without needing to manually create a catkin workspace.
 
-# Usage:
-#   ros-install-this
+# Example usage:
+# $ source /opt/ros/kinetic/setup.bash
+# $ ./ros-install-this
 
-ROSDISTRO=`ls /opt/ros | head -1`
-
-if [ -f 'package.xml' ]
-
-then
-
-TMPFILE=$(mktemp -d /tmp/ros-install-this.XXXXXX)
-PACKAGENAME=`cat package.xml |grep '<name>' | sed -e 's/^.*<name>\(.*\)<\/name>.*$/\1/'`
-mkdir -p $TMPFILE/src/
-cp -rv . $TMPFILE/src/$PACKAGENAME
-source /opt/ros/$ROSDISTRO/setup.bash
-cd $TMPFILE/src/
-catkin_init_workspace
-cd $TMPFILE/
-catkin_make
-sudo bash -c "source /opt/ros/$ROSDISTRO/setup.bash; catkin_make install -DCMAKE_INSTALL_PREFIX=/opt/ros/$ROSDISTRO"
-rm -rf $TMPFILE
-
-else
-
-echo "Error: This directory does not appear to be a ROS package."
-
+if [ -z $ROS_DISTRO ]; then 
+  echo "Error: ROS_DISTRO is not set. Did you source setup.bash?"
+  exit;
 fi
+
+if [ -z $ROS_ROOT ]; then 
+  echo "Error: ROS_ROOT is not set. Did you source setup.bash?"
+  exit;
+fi
+
+if [ -z $ROS_VERSION ]; then 
+  echo "Error: ROS_VERSION is not set. Did you source setup.bash?"
+  exit;
+fi
+
+if [ ! -f 'package.xml' ]; then
+  echo "Error: No package.xml found. The current directory does not appear to be a ROS package."
+  exit;
+fi
+
+ROS_REAL_ROOT=`echo $ROS_ROOT | sed -e s/\\\\/share\\\\/ros//`
+echo "Installing to $ROS_REAL_ROOT ..."
+sleep 2
+TEMP_DIR=$(mktemp -d /tmp/ros-install-this.XXXXXX)
+PACKAGE_NAME=`cat package.xml |grep '<name>' | sed -e 's/^.*<name>\(.*\)<\/name>.*$/\1/'`
+mkdir -p $TEMP_DIR/src/
+cp -rv . $TEMP_DIR/src/$PACKAGE_NAME
+source $ROS_REAL_ROOT/setup.bash
+cd $TEMP_DIR/src/
+catkin_init_workspace
+cd $TEMP_DIR/
+catkin_make
+sudo bash -c "source $ROS_REAL_ROOT/setup.bash; catkin_make install -DCMAKE_INSTALL_PREFIX=$ROS_REAL_ROOT"
+sudo rm -rf $TEMP_DIR
+
