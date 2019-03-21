@@ -7,7 +7,7 @@ from librosshow.plotters import ScopePlotter, AnglePlotter
 class ImuViewer(object):
     def __init__(self):
         self.g = termgraphics.TermGraphics()
-        self.xmax = 10
+        self.right = 10
         self.yaws = [ 0. ] * 128
         self.yaws_p = 0
         self.pitches = [ 0. ] * 128
@@ -21,84 +21,84 @@ class ImuViewer(object):
         vsize = (self.g.shape[1] - 4*vmargin ) / 3
 
         self.yaw_scope_plotter = ScopePlotter(self.g,
-            xmin = hmargin,
-            ymin = vmargin,
-            xmax = hmargin + hsize,
-            ymax = vmargin + vsize,
-            vmin = -math.pi,
-            vmax = math.pi,
+            left = hmargin,
+            top = vmargin,
+            right = hmargin + hsize,
+            bottom = vmargin + vsize,
+            ymin = -math.pi,
+            ymax = math.pi,
         )
 
         self.pitch_scope_plotter = ScopePlotter(self.g,
-            xmin = hmargin,
-            ymin = 2*vmargin + vsize,
-            xmax = hmargin + hsize,
-            ymax = 2*vmargin + 2*vsize,
-            vmin = -math.pi/2,
-            vmax = math.pi/2,
+            left = hmargin,
+            top = 2*vmargin + vsize,
+            right = hmargin + hsize,
+            bottom = 2*vmargin + 2*vsize,
+            ymin = -math.pi/2,
+            ymax = math.pi/2,
         )
 
         self.roll_scope_plotter = ScopePlotter(self.g,
-            xmin = hmargin,
-            ymin = 3*vmargin + 2*vsize,
-            xmax = hmargin + hsize,
-            ymax = 3*vmargin + 3*vsize,
-            vmin = 0,
-            vmax = 2*math.pi,
+            left = hmargin,
+            top = 3*vmargin + 2*vsize,
+            right = hmargin + hsize,
+            bottom = 3*vmargin + 3*vsize,
+            ymin = 0,
+            ymax = 2*math.pi,
         )
 
         self.avx_scope_plotter = ScopePlotter(self.g,
-            xmin = 2*hmargin + hsize,
-            ymin = vmargin,
-            xmax = 2*hmargin + 2*hsize,
-            ymax = vmargin + vsize,
-            vmin = -math.pi,
-            vmax = math.pi,
+            left = 2*hmargin + hsize,
+            top = vmargin,
+            right = 2*hmargin + 2*hsize,
+            bottom = vmargin + vsize,
+            ymin = -math.pi,
+            ymax = math.pi,
         )
 
         self.avy_scope_plotter = ScopePlotter(self.g,
-            xmin = 2*hmargin + hsize,
-            ymin = 2*vmargin + vsize,
-            xmax = 2*hmargin + 2*hsize,
-            ymax = 2*vmargin + 2*vsize,
-            vmin = -math.pi,
-            vmax = math.pi,
+            left = 2*hmargin + hsize,
+            top = 2*vmargin + vsize,
+            right = 2*hmargin + 2*hsize,
+            bottom = 2*vmargin + 2*vsize,
+            ymin = -math.pi,
+            ymax = math.pi,
         )
 
         self.avz_scope_plotter = ScopePlotter(self.g,
-            xmin = 2*hmargin + hsize,
-            ymin = 3*vmargin + 2*vsize,
-            xmax = 2*hmargin + 2*hsize,
-            ymax = 3*vmargin + 3*vsize,
-            vmin = -math.pi,
-            vmax = math.pi,
+            left = 2*hmargin + hsize,
+            top = 3*vmargin + 2*vsize,
+            right = 2*hmargin + 2*hsize,
+            bottom = 3*vmargin + 3*vsize,
+            ymin = -math.pi,
+            ymax = math.pi,
         )
 
         self.lax_scope_plotter = ScopePlotter(self.g,
-            xmin = 3*hmargin + 2*hsize,
-            ymin = vmargin,
-            xmax = 3*hmargin + 3*hsize,
-            ymax = vmargin + vsize,
-            vmin = -9.8,
-            vmax = 9.8,
+            left = 3*hmargin + 2*hsize,
+            top = vmargin,
+            right = 3*hmargin + 3*hsize,
+            bottom = vmargin + vsize,
+            ymin = -9.8,
+            ymax = 9.8,
         )
 
         self.lay_scope_plotter = ScopePlotter(self.g,
-            xmin = 3*hmargin + 2*hsize,
-            ymin = 2*vmargin + vsize,
-            xmax = 3*hmargin + 3*hsize,
-            ymax = 2*vmargin + 2*vsize,
-            vmin = -9.8,
-            vmax = 9.8
+            left = 3*hmargin + 2*hsize,
+            top = 2*vmargin + vsize,
+            right = 3*hmargin + 3*hsize,
+            bottom = 2*vmargin + 2*vsize,
+            ymin = -9.8,
+            ymax = 9.8
         )
 
         self.laz_scope_plotter = ScopePlotter(self.g,
-            xmin = 3*hmargin + 2*hsize,
-            ymin = 3*vmargin + 2*vsize,
-            xmax = 3*hmargin + 3*hsize,
-            ymax = 3*vmargin + 3*vsize,
-            vmin = -9.8,
-            vmax = 9.8,
+            left = 3*hmargin + 2*hsize,
+            top = 3*vmargin + 2*vsize,
+            right = 3*hmargin + 3*hsize,
+            bottom = 3*vmargin + 3*vsize,
+            ymin = -9.8,
+            ymax = 9.8,
         )
 
     def update(self, data):

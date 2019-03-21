@@ -1,46 +1,72 @@
+import numpy as np
+
 class AnglePlotter(object):
-    def __init__(self, g, xmin = 0, xmax = 1, ymin = 0, ymax = 1):
+    def __init__(self, g, left = 0, right = 1, top = 0, bottom = 1):
         self.g = g
-        self.xmin = xmin
-        self.xmax = xmax
-        self.ymin = ymin
-        self.ymax = ymax
+        self.left = left
+        self.right = right
+        self.top = top
+        self.bottom = bottom
 
     def plot(self, angle):
         width, height = self.g.shape
         self.g.rect(
-          (int(self.xmin), int(self.ymin)),
-          (int(self.xmax), int(self.ymax)),
+          (int(self.left), int(self.top)),
+          (int(self.right), int(self.bottom)),
         )
         self.g.line(
-          (int(1 + self.xmin + (self.xmax - self.xmin)/2 - (self.xmax - self.xmin)/2*math.cos(angle)),
-          int(1 + self.ymin + (self.ymax - self.ymin)/2 + (self.ymax - self.ymin)/2*math.sin(angle))),
-          (int(1 + self.xmin + (self.xmax - self.xmin)/2 + (self.xmax - self.xmin)/2*math.cos(angle)),
-          int(1 + self.ymin + (self.ymax - self.ymin)/2 - (self.ymax - self.ymin)/2*math.sin(angle))),
+          (int(1 + self.left + (self.right - self.left)/2 - (self.right - self.left)/2*math.cos(angle)),
+          int(1 + self.top + (self.bottom - self.top)/2 + (self.bottom - self.top)/2*math.sin(angle))),
+          (int(1 + self.left + (self.right - self.left)/2 + (self.right - self.left)/2*math.cos(angle)),
+          int(1 + self.top + (self.bottom - self.top)/2 - (self.bottom - self.top)/2*math.sin(angle))),
         )
 
 class ScopePlotter(object):
-    def __init__(self, g, xmin = 0, xmax = 1, ymin = 0, ymax = 1, vmin = -1, vmax = 1, n = 128):
+    def __init__(self, g, left = 0, right = 1, top = 0, bottom = 1, ymin = -1, ymax = 1, n = 128):
         self.g = g
-        self.xmin = xmin
-        self.xmax = xmax
-        self.ymin = ymin
+        self.left = left
+        self.right = right
+        self.top = top
+        self.bottom = bottom
         self.ymax = ymax
-        self.vmax = vmax
-        self.vmin = vmin
-        self.data = [ 1. ] * n
+        self.ymin = ymin
+        self.data = np.array([ 1. ] * n)
         self.pointer = 0
+
+    def get_nice_scale_bound(self, value):
+        absvalue = np.abs(value)
+        abslogscale = np.ceil(np.log(absvalue) / np.log(10) * 3)
+        if abslogscale % 3 == 0:
+            return np.sign(value) * (10 ** (abslogscale / 3))
+        if abslogscale % 3 == 1:
+            return np.sign(value) * (20 ** ((abslogscale - 1) / 3))
+        if abslogscale % 3 == 2:
+            return np.sign(value) * (50 ** ((abslogscale - 2) / 3))
 
     def plot(self, value):
         self.data[self.pointer] = value
         points = []
+
+        ymin = self.ymin
+        ymax = self.ymax
+
+        if ymin is None or ymax is None:
+            # Autoscale
+            ymax = self.get_nice_scale_bound(np.max(self.data))
+
+            if np.min(self.data) < 0:
+                ymin = -ymax
+            else:
+                ymin = 0.0
+
         for i in range(len(self.data)):
            points.append(
-             (i/len(self.data)*(self.xmax - self.xmin) + self.xmin,
-             (1 - (self.data[i] - self.vmin) / (self.vmax - self.vmin)) * (self.ymax - self.ymin) + self.ymin)
+             (i/len(self.data)*(self.right - self.left) + self.left,
+             (1 - (self.data[i] - ymin) / (ymax - ymin)) * (self.bottom - self.top) + self.top)
            )
         self.g.points(points)
-        self.g.text("{:2.4f}".format(self.vmax), (int(self.xmin), int(self.ymin)))
-        self.g.text("{:2.4f}".format(self.vmin), (int(self.xmin), int(self.ymax)))
+        self.g.text("{:2.4f}".format(ymax), (int(self.left), int(self.top)))
+        self.g.text("{:2.4f}".format((ymax + ymin)/2), (int(self.left), int(self.top + (self.bottom - self.top) / 2 )))
+        self.g.text("{:2.4f}".format(ymin), (int(self.left), int(self.bottom)))
         self.pointer = (self.pointer + 1) % len(self.data)
 
