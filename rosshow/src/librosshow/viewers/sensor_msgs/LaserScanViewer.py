@@ -1,23 +1,26 @@
 #!/usr/bin/env python3
 
 import math
+import time
 
 import librosshow.termgraphics as termgraphics
 
 class LaserScanViewer(object):
     def __init__(self):
         self.g = termgraphics.TermGraphics()
-        self.xmax = 10
-        self.ymax = 10
+        self.scale = 10.0
+        self.target_scale = 10.0
+        self.target_scale_time = 0
         self.msg = None
+        self.last_update_shape_time = 0
 
     def keypress(self, c):
         if c == "[":
-            self.xmax *= 1.5
-            self.ymax *= 1.5
+            self.target_scale *= 1.5
+            self.target_scale_time = time.time()
         elif c == "]":
-            self.xmax /= 1.5
-            self.ymax /= 1.5
+            self.target_scale /= 1.5
+            self.target_scale_time = time.time()
 
     def update(self, msg):
         self.msg = msg
@@ -26,17 +29,36 @@ class LaserScanViewer(object):
         if not self.msg:
             return
 
+        t = time.time()
+
+        # capture changes in terminal shape at least every 0.5s
+        if t - self.last_update_shape_time > 0.5:
+            self.g.update_shape()
+            self.last_update_shape_time = t
+
+        # animation over 0.5s when zooming in/out
+        if self.scale != self.target_scale:
+            animation_fraction = (time.time() - self.target_scale_time) / 0.5
+            if animation_fraction > 1.0:
+                self.scale = self.target_scale
+            else:
+                self.scale = (1 - animation_fraction) * self.scale + animation_fraction * self.target_scale
+
         self.g.clear()
+
         w = self.g.shape[0]
         h = self.g.shape[1]
-        self.ymax = self.xmax * h/w
+
+        xmax = self.scale
+        ymax = self.scale * h/w
+
         for n in range(len(self.msg.ranges)):
             if math.isinf(self.msg.ranges[n]) or math.isnan(self.msg.ranges[n]):
                 continue
             x = self.msg.ranges[n]*math.cos(self.msg.angle_min + n*self.msg.angle_increment)
             y = self.msg.ranges[n]*math.sin(self.msg.angle_min + n*self.msg.angle_increment)
-            i = int(w * (x + self.xmax) / (2 * self.xmax))
-            j = int(h * (1 - (y + self.ymax) / (2 * self.ymax)))
+            i = int(w * (x + xmax) / (2 * xmax))
+            j = int(h * (1 - (y + ymax) / (2 * ymax)))
             self.g.point((i, j))
 
         self.g.draw()

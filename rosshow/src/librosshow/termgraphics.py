@@ -53,9 +53,8 @@ class TermGraphics(object):
         """
         Initialization. This class takes no arguments.
         """
-        self.term_shape = list(reversed(list(map(lambda x: int(x), os.popen('stty size', 'r').read().split()))))
-        self.term_type = os.environ['TERM']
-        self.shape = (self.term_shape[0]*2, self.term_shape[1]*4)
+        self.shape = (0, 0)
+        self.update_shape()
         self.buffer = bytearray(b'\x28\x00' * self.term_shape[0]*self.term_shape[1])
         self.colors = bytearray(3*self.term_shape[0]*self.term_shape[1])
         self.buffer_text = bytearray(self.term_shape[0]*self.term_shape[1])
@@ -77,6 +76,18 @@ class TermGraphics(object):
         self.buffer = bytearray(b'\x28\x00' * self.term_shape[0]*self.term_shape[1])
         self.colors = bytearray(3*self.term_shape[0]*self.term_shape[1])
         self.buffer_text = bytearray(self.term_shape[0]*self.term_shape[1])
+
+    def update_shape(self):
+        """
+        Fetches the terminal shape. Returns True if the shape has changed.
+        """
+        self.term_shape = list(reversed(list(map(lambda x: int(x), os.popen('stty size', 'r').read().split()))))
+        self.term_type = os.environ['TERM']
+        new_shape = (self.term_shape[0]*2, self.term_shape[1]*4)
+        if new_shape != self.shape:
+            self.shape = (self.term_shape[0]*2, self.term_shape[1]*4)
+            return True
+        return False
 
     def set_color(self, color):
         self.current_color = color
