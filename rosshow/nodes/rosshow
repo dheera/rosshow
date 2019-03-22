@@ -27,6 +27,7 @@ VIEWER_MAPPING = {
   "sensor_msgs/LaserScan": ("librosshow.viewers.sensor_msgs.LaserScanViewer", "LaserScanViewer"),
   "sensor_msgs/Imu": ("librosshow.viewers.sensor_msgs.ImuViewer", "ImuViewer"),
   "sensor_msgs/CompressedImage": ("librosshow.viewers.sensor_msgs.CompressedImageViewer", "CompressedImageViewer"),
+  "sensor_msgs/PointCloud2": ("librosshow.viewers.sensor_msgs.PointCloud2Viewer", "PointCloud2Viewer"),
   "sensor_msgs/Image": ("librosshow.viewers.sensor_msgs.ImageViewer", "ImageViewer"),
   "sensor_msgs/NavSatFix": ("librosshow.viewers.sensor_msgs.NavSatFixViewer", "NavSatFixViewer"),
 }
