@@ -31,7 +31,7 @@ VIEWER_MAPPING = {
   "sensor_msgs/NavSatFix": ("librosshow.viewers.sensor_msgs.NavSatFixViewer", "NavSatFixViewer"),
 }
 
-def capture_key_loop():
+def capture_key_loop(viewer):
     getch = Getch()
     while True:
         c = getch()
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     rospy.Subscriber(TOPIC, message_class, viewer.update)
 
-    threading.Thread(target = capture_key_loop, daemon = True).start()
+    threading.Thread(target = capture_key_loop, args = (viewer,), daemon = True).start()
 
     rate = rospy.Rate(15)
     while not rospy.is_shutdown():
