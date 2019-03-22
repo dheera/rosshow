@@ -12,11 +12,6 @@ if [ -z $ROS_DISTRO ]; then
   exit;
 fi
 
-if [ -z $ROS_ROOT ]; then 
-  echo "Error: ROS_ROOT is not set. Did you source setup.bash?"
-  exit;
-fi
-
 if [ -z $ROS_VERSION ]; then 
   echo "Error: ROS_VERSION is not set. Did you source setup.bash?"
   exit;
@@ -27,11 +22,29 @@ if [ ! -f 'package.xml' ]; then
   exit;
 fi
 
+PACKAGE_NAME=`cat package.xml |grep '<name>' | sed -e 's/^.*<name>\(.*\)<\/name>.*$/\1/'`
+
+if [ -z $PACKAGE_NAME ]; then
+  echo "Error: Cannot determine name from package.xml. Is package.xml properly written?"
+  exit;
+fi
+
 ROS_REAL_ROOT=`echo $ROS_ROOT | sed -e s/\\\\/share\\\\/ros//`
+
+if [ -z $ROS_REAL_ROOT ]; then 
+  echo "Error: Cannot determine real root."
+  exit;
+fi
+
+TEMP_DIR=$(mktemp -d /tmp/ros-install-this.XXXXXX)
+
+if [ -z $TEMP_DIR ]; then 
+  echo "Error: Error creating temporary dir."
+  exit;
+fi
+
 echo "Installing to $ROS_REAL_ROOT ..."
 sleep 2
-TEMP_DIR=$(mktemp -d /tmp/ros-install-this.XXXXXX)
-PACKAGE_NAME=`cat package.xml |grep '<name>' | sed -e 's/^.*<name>\(.*\)<\/name>.*$/\1/'`
 mkdir -p $TEMP_DIR/src/
 cp -rv . $TEMP_DIR/src/$PACKAGE_NAME
 source $ROS_REAL_ROOT/setup.bash
@@ -40,5 +53,8 @@ catkin_init_workspace
 cd $TEMP_DIR/
 catkin_make
 sudo bash -c "source $ROS_REAL_ROOT/setup.bash; catkin_make install -DCMAKE_INSTALL_PREFIX=$ROS_REAL_ROOT"
-sudo rm -rf $TEMP_DIR
+
+# Done in 2 steps to avoid running the "rm -rf" part as root
+sudo chmod -R 777 $TEMP_DIR/devel $TEMP_DIR/build $TEMP_DIR/src
+rm -rf $TEMP_DIR
 
