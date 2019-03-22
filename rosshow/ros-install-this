@@ -43,8 +43,7 @@ if [ -z $TEMP_DIR ]; then
   exit;
 fi
 
-echo "Installing to $ROS_REAL_ROOT ..."
-sleep 2
+echo "Building ..."
 mkdir -p $TEMP_DIR/src/
 cp -rv . $TEMP_DIR/src/$PACKAGE_NAME
 source $ROS_REAL_ROOT/setup.bash
@@ -52,6 +51,12 @@ cd $TEMP_DIR/src/
 catkin_init_workspace
 cd $TEMP_DIR/
 catkin_make
+
+echo
+echo "You may be now be asked for your sudo password to complete installation."
+echo "Installation target is: $ROS_REAL_ROOT"
+echo
+
 sudo bash -c "source $ROS_REAL_ROOT/setup.bash; catkin_make install -DCMAKE_INSTALL_PREFIX=$ROS_REAL_ROOT"
 
 # Done in 2 steps to avoid running the "rm -rf" part as root
