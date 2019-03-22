@@ -5,6 +5,9 @@ import rospy
 import sys
 import time
 import random
+import threading
+from librosshow.getch import Getch
+
 from sensor_msgs.msg import Image
 
 from librosshow.viewers.sensor_msgs.LaserScanViewer import LaserScanViewer
@@ -27,6 +30,16 @@ VIEWER_MAPPING = {
   "sensor_msgs/Image": ("librosshow.viewers.sensor_msgs.ImageViewer", "ImageViewer"),
   "sensor_msgs/NavSatFix": ("librosshow.viewers.sensor_msgs.NavSatFixViewer", "NavSatFixViewer"),
 }
+
+def capture_key_loop():
+    getch = Getch()
+    while True:
+        c = getch()
+        if c == '\x03': # Ctrl+C
+            rospy.signal_shutdown("Ctrl+C pressed")
+        else:
+            if "keypress" in dir(viewer):
+                viewer.keypress(c)
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
@@ -53,6 +66,8 @@ if __name__ == "__main__":
     message_class = getattr(__import__(message_package + ".msg", fromlist=(message_name)), message_name)
 
     rospy.Subscriber(TOPIC, message_class, viewer.update)
+
+    threading.Thread(target = capture_key_loop, daemon = True).start()
 
     rate = rospy.Rate(15)
     while not rospy.is_shutdown():

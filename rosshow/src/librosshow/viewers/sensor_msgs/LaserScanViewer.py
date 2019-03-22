@@ -11,6 +11,14 @@ class LaserScanViewer(object):
         self.ymax = 10
         self.msg = None
 
+    def keypress(self, c):
+        if c == "[":
+            self.xmax *= 1.5
+            self.ymax *= 1.5
+        elif c == "]":
+            self.xmax /= 1.5
+            self.ymax /= 1.5
+
     def update(self, msg):
         self.msg = msg
 
