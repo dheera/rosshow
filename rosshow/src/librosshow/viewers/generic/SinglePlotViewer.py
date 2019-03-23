@@ -36,7 +36,15 @@ class SinglePlotViewer(object):
 
         # capture changes in terminal shape at least every 0.25s
         if t - self.last_update_shape_time > 0.25:
-            self.g.update_shape()
+            if self.g.update_shape():
+                hmargin = self.g.shape[0]/40.
+                vmargin = self.g.shape[1]/20.
+                hsize = (self.g.shape[0] - 4*hmargin )
+                vsize = (self.g.shape[1] - 4*vmargin )
+                self.scope_plotter.left = hmargin
+                self.scope_plotter.top = vmargin
+                self.scope_plotter.right = hmargin + hsize
+                self.scope_plotter.bottom = vmargin + vsize
             self.last_update_shape_time = t
 
         self.g.clear()

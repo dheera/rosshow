@@ -1,5 +1,5 @@
 import numpy as np
-
+import librosshow.termgraphics as termgraphics
 class AnglePlotter(object):
     def __init__(self, g, left = 0, right = 1, top = 0, bottom = 1):
         self.g = g
@@ -71,8 +71,10 @@ class ScopePlotter(object):
              (int(float(i)/len(self.data)*(self.right - self.left) + self.left),
              int((1.0 - (self.data[i] - ymin) / (ymax - ymin)) * (self.bottom - self.top) + self.top))
            )
+        self.g.set_color(termgraphics.COLOR_WHITE)
         self.g.points(points)
-        self.g.text("{:2.4f}".format(ymax), (int(self.left), int(self.top)))
-        self.g.text("{:2.4f}".format((ymax + ymin)/2), (int(self.left), int(self.top + (self.bottom - self.top) / 2 )))
-        self.g.text("{:2.4f}".format(ymin), (int(self.left), int(self.bottom)))
+        self.g.set_color((127, 127, 127))
+        self.g.text("{:2.4f}".format(ymax).rstrip("0").rstrip("."), (int(self.left), int(self.top)))
+        self.g.text("{:2.4f}".format((ymax + ymin)/2).rstrip("0").rstrip("."), (int(self.left), int(self.top + (self.bottom - self.top) / 2 )))
+        self.g.text("{:2.4f}".format(ymin).rstrip("0").rstrip("."), (int(self.left), int(self.bottom)))
 
