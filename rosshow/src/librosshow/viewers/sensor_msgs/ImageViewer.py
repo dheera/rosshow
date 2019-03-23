@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import numpy
 import time
 import scipy.misc
@@ -42,16 +40,14 @@ class ImageViewer(object):
             print("Image encoding " + self.image.encoding + " not supported yet.")
             return
 
-        ratio = self.image.height / self.image.width
-        if w/h * 4/2>= ratio:
-           w = h * ratio
+        ratio = float(self.image.height) / self.image.width
+        if float(w)/h * 2.0>= ratio:
+           w = float(h) * ratio
         else:
-           h = w / ratio
+           h = float(w) / ratio
 
-        w = int(w/4)
-        h = int(h/2)
-        #w = int(w/7)
-        #h = int(h/2)
+        w = int(w/4.0)
+        h = int(h/2.0)
         resized_image = list(map(tuple, scipy.misc.imresize(current_image, (w, h)).reshape((w*h, 3))))
 
         self.g.image(resized_image, h, w, (0, 0), image_type = termgraphics.IMAGE_RGB_2X4)

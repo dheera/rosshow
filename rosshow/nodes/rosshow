@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import os
 import rospy
@@ -73,7 +73,9 @@ if __name__ == "__main__":
 
     rospy.Subscriber(TOPIC, message_class, viewer.update)
 
-    threading.Thread(target = capture_key_loop, args = (viewer,), daemon = True).start()
+    thread = threading.Thread(target = capture_key_loop, args = (viewer,))
+    thread.daemon = True
+    thread.start()
 
     rate = rospy.Rate(15)
     while not rospy.is_shutdown():

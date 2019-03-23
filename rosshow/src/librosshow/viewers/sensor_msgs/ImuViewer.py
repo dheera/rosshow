@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import math
 import librosshow.termgraphics as termgraphics
 from librosshow.plotters import ScopePlotter, AnglePlotter

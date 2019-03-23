@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import io
 import numpy as np
 import time
@@ -39,16 +37,14 @@ class CompressedImageViewer(object):
         current_image = np.fromstring(current_image_obj.tobytes(), dtype=np.uint8)
         current_image = current_image.reshape((current_image_obj.size[1], current_image_obj.size[0], 3))    
 
-        ratio = current_image.shape[0] / current_image.shape[1]
-        if w/h * 4/2>= ratio:
-           w = h * ratio
+        ratio = float(current_image.shape[0]) / current_image.shape[1]
+        if float(w)/float(h) * 2.0>= ratio:
+           w = float(h) * ratio
         else:
-           h = w / ratio
+           h = float(w) / ratio
 
-        w = int(w/4)
-        h = int(h/2)
-        #w = int(w/7)
-        #h = int(h/2)
+        w = int(w/4.0)
+        h = int(h/2.0)
         resized_image = list(map(tuple, scipy.misc.imresize(current_image, (w, h)).reshape((w*h, 3))))
 
         self.g.image(resized_image, h, w, (0, 0), image_type = termgraphics.IMAGE_RGB_2X4)

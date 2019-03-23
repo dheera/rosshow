@@ -19,10 +19,10 @@ class AnglePlotter(object):
           (int(self.right), int(self.bottom)),
         )
         self.g.line(
-          (int(1 + self.left + (self.right - self.left)/2 - (self.right - self.left)/2*math.cos(self.angle)),
-          int(1 + self.top + (self.bottom - self.top)/2 + (self.bottom - self.top)/2*math.sin(self.angle))),
-          (int(1 + self.left + (self.right - self.left)/2 + (self.right - self.left)/2*math.cos(self.angle)),
-          int(1 + self.top + (self.bottom - self.top)/2 - (self.bottom - self.top)/2*math.sin(self.angle))),
+          (int(1 + self.left + (self.right - self.left)/2.0 - (self.right - self.left)/2.0*math.cos(self.angle)),
+          int(1 + self.top + (self.bottom - self.top)/2.0 + (self.bottom - self.top)/2.0*math.sin(self.angle))),
+          (int(1 + self.left + (self.right - self.left)/2.0 + (self.right - self.left)/2.0*math.cos(self.angle)),
+          int(1 + self.top + (self.bottom - self.top)/2.0 - (self.bottom - self.top)/2.0*math.sin(self.angle))),
         )
 
 class ScopePlotter(object):
@@ -68,8 +68,8 @@ class ScopePlotter(object):
 
         for i in range(len(self.data)):
            points.append(
-             (i/len(self.data)*(self.right - self.left) + self.left,
-             (1 - (self.data[i] - ymin) / (ymax - ymin)) * (self.bottom - self.top) + self.top)
+             (int(float(i)/len(self.data)*(self.right - self.left) + self.left),
+             int((1.0 - (self.data[i] - ymin) / (ymax - ymin)) * (self.bottom - self.top) + self.top))
            )
         self.g.points(points)
         self.g.text("{:2.4f}".format(ymax), (int(self.left), int(self.top)))
