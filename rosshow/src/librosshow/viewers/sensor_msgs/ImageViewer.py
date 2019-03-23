@@ -5,12 +5,14 @@ import scipy.misc
 import librosshow.termgraphics as termgraphics
 
 class ImageViewer(object):
-    def __init__(self):
+    def __init__(self, title = ""):
         self.g = termgraphics.TermGraphics()
         self.xmax = 20
         self.ymax = 20
         self.last_update_time = 0
         self.image = None
+        self.title = title
+        self.last_update_shape_time = 0
 
     def update(self, msg):
         self.image = msg
@@ -18,6 +20,13 @@ class ImageViewer(object):
     def draw(self):
         if not self.image:
             return
+
+        t = time.time()
+
+        # capture changes in terminal shape at least every 0.25s
+        if t - self.last_update_shape_time > 0.25:
+            self.g.update_shape()
+            self.last_update_shape_time = t
 
         self.g.clear()
         w = self.g.shape[0]
@@ -40,16 +49,24 @@ class ImageViewer(object):
             print("Image encoding " + self.image.encoding + " not supported yet.")
             return
 
-        ratio = float(self.image.height) / self.image.width
-        if float(w)/h * 2.0>= ratio:
-           w = float(h) * ratio
+        image_ratio = 0.5 * float(current_image.shape[0]) / current_image.shape[1] # height / width
+        terminal_ratio = 0.5 * float(h) / w  # height / width
+
+        if image_ratio > terminal_ratio:
+           target_image_height = int(h / 4.0)
+           target_image_width = int(target_image_height / image_ratio)
         else:
-           h = float(w) / ratio
+           target_image_width = int(w / 2.0)
+           target_image_height = int(image_ratio * target_image_width)
 
-        w = int(w/4.0)
-        h = int(h/2.0)
-        resized_image = list(map(tuple, scipy.misc.imresize(current_image, (w, h)).reshape((w*h, 3))))
+        resized_image = list(map(tuple, scipy.misc.imresize(current_image, \
+                (target_image_height, target_image_width)).reshape((target_image_width * target_image_height, 3))))
 
-        self.g.image(resized_image, h, w, (0, 0), image_type = termgraphics.IMAGE_RGB_2X4)
+        self.g.image(resized_image, target_image_width, target_image_height, (0, 0), image_type = termgraphics.IMAGE_RGB_2X4)
+
+        if self.title:
+            self.g.set_color((0, 127, 255))
+            self.g.text(self.title, (0, self.g.shape[1] - 4))
+
         self.g.draw()
         self.last_update_time = time.time()

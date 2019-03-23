@@ -6,7 +6,7 @@ import sensor_msgs.point_cloud2 as pcl2
 import librosshow.termgraphics as termgraphics
 
 class PointCloud2Viewer(object):
-    def __init__(self):
+    def __init__(self, title = ""):
         self.g = termgraphics.TermGraphics()
         self.scale = 20
         self.spin = 0.0
@@ -18,6 +18,7 @@ class PointCloud2Viewer(object):
         self.calculate_rotation()
         self.msg = None
         self.last_update_shape_time = 0
+        self.title = title
 
     def keypress(self, c):
         if c == "[":
@@ -59,8 +60,8 @@ class PointCloud2Viewer(object):
 
         t = time.time()
 
-        # capture changes in terminal shape at least every 0.5s
-        if t - self.last_update_shape_time > 0.5:
+        # capture changes in terminal shape at least every 0.25s
+        if t - self.last_update_shape_time > 0.25:
             self.g.update_shape()
             self.last_update_shape_time = t
 
@@ -99,4 +100,10 @@ class PointCloud2Viewer(object):
                 self.g.set_color((255, screen_c[i], screen_c[i]))
                 last_c = screen_c[i]
             self.g.point((screen_is[i], screen_js[i]))
+
+        if self.title:
+            self.g.set_color((0, 127, 255))
+            self.g.text(self.title, (0, self.g.shape[1] - 4))
+
         self.g.draw()
+

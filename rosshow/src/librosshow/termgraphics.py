@@ -123,11 +123,12 @@ class TermGraphics(object):
         """
         Draws text at point = (x0, y0).
         """
-        text = text[0:self.term_shape[0]-point[1] >> 2]
+        text = text[0:self.term_shape[0] - int(point[0] >> 2)]
         index = ((point[0] >> 1) + (point[1] >> 2) * self.term_shape[0])
         for i in range(len(text)):
-            self.buffer_text[index + i] = ord(text[i])
-            self.colors[3*(index + i):3*(index+i)+3] = self.current_color
+            if index + i < len(self.buffer_text):
+                self.buffer_text[index + i] = ord(text[i])
+                self.colors[3*(index + i):3*(index+i)+3] = self.current_color
 
     def poly(self, points):
         """

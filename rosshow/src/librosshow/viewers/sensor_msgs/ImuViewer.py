@@ -1,10 +1,13 @@
+import time
 import math
 import librosshow.termgraphics as termgraphics
 from librosshow.plotters import ScopePlotter, AnglePlotter
 
 class ImuViewer(object):
-    def __init__(self):
+    def __init__(self, title = ""):
         self.g = termgraphics.TermGraphics()
+        self.last_update_shape_time = 0
+        self.title = title
         self.right = 10
         self.yaws = [ 0. ] * 128
         self.yaws_p = 0
@@ -120,7 +123,15 @@ class ImuViewer(object):
         self.laz_scope_plotter.update(data.linear_acceleration.z)
 
     def draw(self):
+        t = time.time()
+
+        # capture changes in terminal shape at least every 0.5s
+        if t - self.last_update_shape_time > 0.25:
+            self.g.update_shape()
+            self.last_update_shape_time = t
+
         self.g.clear()
+        self.g.set_color(termgraphics.COLOR_WHITE)
         self.yaw_scope_plotter.plot()
         self.pitch_scope_plotter.plot()
         self.roll_scope_plotter.plot()
@@ -130,4 +141,7 @@ class ImuViewer(object):
         self.lax_scope_plotter.plot()
         self.lay_scope_plotter.plot()
         self.laz_scope_plotter.plot()
+        if self.title:
+            self.g.set_color((0, 127, 255))
+            self.g.text(self.title, (0, self.g.shape[1] - 4))
         self.g.draw()

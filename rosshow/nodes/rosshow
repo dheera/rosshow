@@ -66,7 +66,7 @@ if __name__ == "__main__":
 
     module_name, class_name, viewer_kwargs = VIEWER_MAPPING[topic_types[TOPIC]]
     viewer_class = getattr(__import__(module_name, fromlist=(class_name)), class_name)
-    viewer = viewer_class(**viewer_kwargs)
+    viewer = viewer_class(title = TOPIC, **viewer_kwargs)
 
     message_package, message_name = topic_types[TOPIC].split("/", 2)
     message_class = getattr(__import__(message_package + ".msg", fromlist=(message_name)), message_name)

@@ -109,13 +109,19 @@ class LocationPlotter(object):
 
 class NavSatFixViewer(object):
 
-    def __init__(self):
+    def __init__(self, title = ""):
         self.g = termgraphics.TermGraphics()
         self.location_plotter = LocationPlotter(self.g)
+        self.title = title
 
     def update(self, data):
         self.location_plotter.update((data.latitude, data.longitude))
 
     def draw(self):
         self.location_plotter.draw()
+
+        if self.title:
+            self.g.set_color((0, 127, 255))
+            self.g.text(self.title, (0, self.g.shape[1] - 4))
+
         self.g.draw()
