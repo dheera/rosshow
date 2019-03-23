@@ -38,7 +38,7 @@ VIEWER_MAPPING = {
 }
 
 def capture_key_loop(viewer):
-    getch = Getch()
+    global getch
     while True:
         c = getch()
         if c == '\x03': # Ctrl+C
@@ -73,12 +73,17 @@ if __name__ == "__main__":
 
     rospy.Subscriber(TOPIC, message_class, viewer.update)
 
+    getch = Getch()
+
     thread = threading.Thread(target = capture_key_loop, args = (viewer,))
     thread.daemon = True
     thread.start()
 
     rate = rospy.Rate(15)
-    while not rospy.is_shutdown():
-        rate.sleep()
-        viewer.draw()
+    try:
+        while not rospy.is_shutdown():
+            rate.sleep()
+            viewer.draw()
+    finally:
+        getch.reset()
 

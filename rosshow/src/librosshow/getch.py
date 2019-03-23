@@ -8,10 +8,13 @@ class Getch:
 
     def __call__(self): return self.impl()
 
+    def reset(self): return self.impl.reset()
 
 class _GetchUnix:
     def __init__(self):
-        import tty, sys
+        import sys, tty, termios
+        self.fd = sys.stdin.fileno()
+        self.old_settings = termios.tcgetattr(self.fd)
 
     def __call__(self):
         import sys, tty, termios
@@ -24,6 +27,9 @@ class _GetchUnix:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
 
+    def reset(self):
+        import sys, tty, termios
+        termios.tcsetattr(self.fd, termios.TCSADRAIN, self.old_settings)
 
 class _GetchWindows:
     def __init__(self):
@@ -33,5 +39,7 @@ class _GetchWindows:
         import msvcrt
         return msvcrt.getch()
 
+    def reset(self):
+        return
 
 getch = Getch()
