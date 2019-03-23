@@ -43,9 +43,11 @@ rosrun rosshow rosshow <topicname>
 
 ## sensor_msgs/PointCloud2
 
+Yes you can actually view Velodyne data in the terminal if you really want to.
+
 ![screenshot](/screenshot5.png?raw=true "screenshot")
 
-## sensor_msgs/Image
+## sensor_msgs/Image, sensor_msgs/CompressedImage
 
 ![screenshot](/screenshot4.png?raw=true "screenshot")
 
@@ -60,3 +62,9 @@ rosrun rosshow rosshow <topicname>
 ## sensor_msgs/NavSatFix
 
 ![screenshot](/screenshot3.png?raw=true "screenshot")
+
+## std_msgs/Int32, std_msgs/Float32, etc.
+
+For most std_msgs numeric types you will get a time series plot.
+
+![screenshot](/screenshot6.png?raw=true "screenshot")
