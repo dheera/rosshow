@@ -41,11 +41,11 @@ class ScopePlotter(object):
         absvalue = np.abs(value)
         abslogscale = np.ceil(np.log(absvalue) / np.log(10) * 3)
         if abslogscale % 3 == 0:
-            return np.sign(value) * (10 ** (abslogscale / 3))
+            return np.sign(value) * (1 * 10 ** (abslogscale / 3))
         if abslogscale % 3 == 1:
-            return np.sign(value) * (20 ** ((abslogscale - 1) / 3))
+            return np.sign(value) * (2 * 10 ** ((abslogscale - 1) / 3))
         if abslogscale % 3 == 2:
-            return np.sign(value) * (50 ** ((abslogscale - 2) / 3))
+            return np.sign(value) * (5 * 10 ** ((abslogscale - 2) / 3))
 
     def update(self, value):
         self.data[self.pointer] = value
