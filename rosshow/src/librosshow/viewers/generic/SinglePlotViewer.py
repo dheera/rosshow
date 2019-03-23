@@ -5,10 +5,11 @@ import librosshow.termgraphics as termgraphics
 from librosshow.plotters import ScopePlotter
 
 class SinglePlotViewer(object):
-    def __init__(self, title = ""):
+    def __init__(self, title = "", data_field = "data"):
         self.g = termgraphics.TermGraphics()
         self.xmax = 10
         self.title = title
+        self.data_field = data_field
 
         hmargin = self.g.shape[0]/40.
         vmargin = self.g.shape[1]/20.
@@ -25,7 +26,7 @@ class SinglePlotViewer(object):
         )
 
     def update(self, msg):
-        self.scope_plotter.update(float(msg.data))
+        self.scope_plotter.update(float(getattr(msg, self.data_field)))
 
     def draw(self):
         self.g.clear()

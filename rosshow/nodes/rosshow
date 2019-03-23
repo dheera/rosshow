@@ -14,22 +14,23 @@ from librosshow.viewers.sensor_msgs.LaserScanViewer import LaserScanViewer
 from sensor_msgs.msg import LaserScan
 
 VIEWER_MAPPING = {
-  "std_msgs/Float32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer"),
-  "std_msgs/Float64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer"),
-  "std_msgs/Int8": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer"),
-  "std_msgs/Int16": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer"),
-  "std_msgs/Int32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer"),
-  "std_msgs/Int64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer"),
-  "std_msgs/UInt8": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer"),
-  "std_msgs/UInt16": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer"),
-  "std_msgs/UInt32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer"),
-  "std_msgs/UInt64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer"),
-  "sensor_msgs/LaserScan": ("librosshow.viewers.sensor_msgs.LaserScanViewer", "LaserScanViewer"),
-  "sensor_msgs/Imu": ("librosshow.viewers.sensor_msgs.ImuViewer", "ImuViewer"),
-  "sensor_msgs/CompressedImage": ("librosshow.viewers.sensor_msgs.CompressedImageViewer", "CompressedImageViewer"),
-  "sensor_msgs/PointCloud2": ("librosshow.viewers.sensor_msgs.PointCloud2Viewer", "PointCloud2Viewer"),
-  "sensor_msgs/Image": ("librosshow.viewers.sensor_msgs.ImageViewer", "ImageViewer"),
-  "sensor_msgs/NavSatFix": ("librosshow.viewers.sensor_msgs.NavSatFixViewer", "NavSatFixViewer"),
+  "std_msgs/Float32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Float64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Int8": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Int16": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Int32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Int64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/UInt8": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/UInt16": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/UInt32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/UInt64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "sensor_msgs/LaserScan": ("librosshow.viewers.sensor_msgs.LaserScanViewer", "LaserScanViewer", {}),
+  "sensor_msgs/Imu": ("librosshow.viewers.sensor_msgs.ImuViewer", "ImuViewer", {}),
+  "sensor_msgs/Temperature": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "temperature"}),
+  "sensor_msgs/CompressedImage": ("librosshow.viewers.sensor_msgs.CompressedImageViewer", "CompressedImageViewer", {}),
+  "sensor_msgs/PointCloud2": ("librosshow.viewers.sensor_msgs.PointCloud2Viewer", "PointCloud2Viewer", {}),
+  "sensor_msgs/Image": ("librosshow.viewers.sensor_msgs.ImageViewer", "ImageViewer", {}),
+  "sensor_msgs/NavSatFix": ("librosshow.viewers.sensor_msgs.NavSatFixViewer", "NavSatFixViewer", {}),
 }
 
 def capture_key_loop(viewer):
@@ -59,9 +60,9 @@ if __name__ == "__main__":
         print("Unsupported message type.")
         exit()
 
-    module_name, class_name = VIEWER_MAPPING[topic_types[TOPIC]]
+    module_name, class_name, viewer_kwargs = VIEWER_MAPPING[topic_types[TOPIC]]
     viewer_class = getattr(__import__(module_name, fromlist=(class_name)), class_name)
-    viewer = viewer_class()
+    viewer = viewer_class(**viewer_kwargs)
 
     message_package, message_name = topic_types[TOPIC].split("/", 2)
     message_class = getattr(__import__(message_package + ".msg", fromlist=(message_name)), message_name)
