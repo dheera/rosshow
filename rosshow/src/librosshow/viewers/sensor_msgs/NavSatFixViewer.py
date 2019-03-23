@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 
-from PIL import Image, ImageOps
 import functools
 from io import BytesIO
 import math
 import requests
 import time
 import librosshow.termgraphics as termgraphics
+
+try:
+    from PIL import Image, ImageOps
+except ImportError:
+    print("This message type requires an additional Python package. Please run:")
+    print("  $ sudo pip3 install pillow")
+    print("and try again.")
+    exit()
 
 @functools.lru_cache()
 def get_tile(xtile, ytile, zoom):
@@ -74,10 +81,19 @@ class LocationPlotter(object):
 
         self.g.points(points, clear_block = True)
         self.g.set_color(termgraphics.COLOR_RED)
-        self.g.point((
-           width * (self.data[self.pointer][1] - lon_min) / (lon_max - lon_min),
-           height * (self.data[self.pointer][0] - lat_min) / (lat_max - lat_min)
-        ), clear_block = True)
+
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                self.g.point((
+                    int(width * (self.data[self.pointer][1] - lon_min) / (lon_max - lon_min)) + i,
+                    int(height * (self.data[self.pointer][0] - lat_min) / (lat_max - lat_min)) + j
+                ), clear_block = True)
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                self.g.point((
+                    int(width * (self.data[self.pointer][1] - lon_min) / (lon_max - lon_min)) + i,
+                    int(height * (self.data[self.pointer][0] - lat_min) / (lat_max - lat_min)) + j
+                ), clear_block = False)
 
 class NavSatFixViewer(object):
 
