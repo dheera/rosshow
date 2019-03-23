@@ -35,9 +35,12 @@ class ScopePlotter(object):
         self.ymax = ymax
         self.ymin = ymin
         self.data = np.array([ np.nan ] * n, dtype = np.float32)
+        self.data[0] = 0.0
         self.pointer = 0
 
     def get_nice_scale_bound(self, value):
+        if value < 1e-6:
+            return 1.0
         absvalue = np.abs(value)
         abslogscale = np.ceil(np.log(absvalue) / np.log(10) * 3)
         if abslogscale % 3 == 0:
