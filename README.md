@@ -26,8 +26,17 @@ source /opt/ros/kinetic/setup.bash
 ```
 
 # Usage
+
+If you installed it to the system:
+
 ```
 rosshow <topicname>
+```
+
+If you're using it from a catkin workspace:
+
+```
+rosrun rosshow rosshow <topicname>
 ```
 
 # Screenshots
