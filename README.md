@@ -41,3 +41,7 @@ rosshow <topicname>
 ## sensor_msgs/Image
 
 ![screenshot](/screenshot4.png?raw=true "screenshot")
+
+## sensor_msgs/PointCloud2
+
+![screenshot](/screenshot5.png?raw=true "screenshot")
