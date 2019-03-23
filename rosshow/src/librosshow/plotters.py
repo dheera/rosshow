@@ -26,7 +26,7 @@ class AnglePlotter(object):
         )
 
 class ScopePlotter(object):
-    def __init__(self, g, left = 0, right = 1, top = 0, bottom = 1, ymin = -1, ymax = 1, n = 128):
+    def __init__(self, g, left = 0, right = 1, top = 0, bottom = 1, ymin = None, ymax = None, n = 128):
         self.g = g
         self.left = left
         self.right = right
