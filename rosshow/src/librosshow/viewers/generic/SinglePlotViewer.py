@@ -30,20 +30,21 @@ class SinglePlotViewer(object):
         self.scope_plotter.update(float(getattr(msg, self.data_field)))
 
     def draw(self):
-        if not self.msg:
-            return
-
         t = time.time()
 
-        # capture changes in terminal shape at least every 0.5s
-        if t - self.last_update_shape_time > 0.5:
+        # capture changes in terminal shape at least every 0.25s
+        if t - self.last_update_shape_time > 0.25:
             self.g.update_shape()
+            self.last_update_shape_time = t
+
         self.g.clear()
 
         self.g.set_color(termgraphics.COLOR_WHITE)
         self.scope_plotter.plot()
+
         if self.title:
             self.g.set_color((0, 127, 255))
             self.g.text(self.title, (0, self.g.shape[1] - 4))
+
         self.g.draw()
 
