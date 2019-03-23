@@ -10,6 +10,7 @@ class SinglePlotViewer(object):
         self.xmax = 10
         self.title = title
         self.data_field = data_field
+        self.last_value = 0.0
         self.last_update_shape_time = 0
 
         hmargin = self.g.shape[0]/40.
@@ -27,7 +28,8 @@ class SinglePlotViewer(object):
         )
 
     def update(self, msg):
-        self.scope_plotter.update(float(getattr(msg, self.data_field)))
+        self.last_value = float(getattr(msg, self.data_field))
+        self.scope_plotter.update(self.last_value)
 
     def draw(self):
         t = time.time()
@@ -45,6 +47,9 @@ class SinglePlotViewer(object):
         if self.title:
             self.g.set_color((0, 127, 255))
             self.g.text(self.title, (0, self.g.shape[1] - 4))
+
+        self.g.set_color((0, 255, 127))
+        self.g.text(str(self.last_value), (int(self.g.shape[0]/3), self.g.shape[1] - 4))
 
         self.g.draw()
 
