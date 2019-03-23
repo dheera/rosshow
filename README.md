@@ -9,6 +9,12 @@ This displays various sensor messages in a useful fashion using Unicode Braille 
 
 # Installation
 
+Prerequisites:
+
+```
+sudo pip install numpy scipy pillow
+```
+
 This package will install to your ROS bin directory, i.e. where other ROS binaries such as rostopic, rosnode, etc. are located. Or if you don't want to do that or don't have permissions, you can add it to your catkin workspace and run it using rosrun.
 
 To install to the system:
@@ -20,13 +26,30 @@ source /opt/ros/kinetic/setup.bash
 ```
 
 # Usage
+
+If you installed it to the system:
+
 ```
 rosshow <topicname>
 ```
 
+If you're using it from a catkin workspace:
+
+```
+rosrun rosshow rosshow <topicname>
+```
+
 # Screenshots
 
-## sensor_msgs/LaserScan and sensor_msgs/PointCloud2
+## sensor_msgs/PointCloud2
+
+![screenshot](/screenshot5.png?raw=true "screenshot")
+
+## sensor_msgs/Image
+
+![screenshot](/screenshot4.png?raw=true "screenshot")
+
+## sensor_msgs/LaserScan
 
 ![screenshot](/screenshot0.png?raw=true "screenshot")
 
@@ -37,11 +60,3 @@ rosshow <topicname>
 ## sensor_msgs/NavSatFix
 
 ![screenshot](/screenshot3.png?raw=true "screenshot")
-
-## sensor_msgs/Image
-
-![screenshot](/screenshot4.png?raw=true "screenshot")
-
-## sensor_msgs/PointCloud2
-
-![screenshot](/screenshot5.png?raw=true "screenshot")
