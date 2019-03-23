@@ -9,6 +9,12 @@ This displays various sensor messages in a useful fashion using Unicode Braille 
 
 # Installation
 
+Prerequisites:
+
+```
+sudo pip install numpy scipy pillow
+```
+
 This package will install to your ROS bin directory, i.e. where other ROS binaries such as rostopic, rosnode, etc. are located. Or if you don't want to do that or don't have permissions, you can add it to your catkin workspace and run it using rosrun.
 
 To install to the system:
