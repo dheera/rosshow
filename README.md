@@ -26,7 +26,15 @@ rosshow <topicname>
 
 # Screenshots
 
-## sensor_msgs/LaserScan and sensor_msgs/PointCloud2
+## sensor_msgs/PointCloud2
+
+![screenshot](/screenshot5.png?raw=true "screenshot")
+
+## sensor_msgs/Image
+
+![screenshot](/screenshot4.png?raw=true "screenshot")
+
+## sensor_msgs/LaserScan
 
 ![screenshot](/screenshot0.png?raw=true "screenshot")
 
@@ -37,11 +45,3 @@ rosshow <topicname>
 ## sensor_msgs/NavSatFix
 
 ![screenshot](/screenshot3.png?raw=true "screenshot")
-
-## sensor_msgs/Image
-
-![screenshot](/screenshot4.png?raw=true "screenshot")
-
-## sensor_msgs/PointCloud2
-
-![screenshot](/screenshot5.png?raw=true "screenshot")
