@@ -34,7 +34,7 @@ class ScopePlotter(object):
         self.bottom = bottom
         self.ymax = ymax
         self.ymin = ymin
-        self.data = np.array([ 1. ] * n)
+        self.data = np.array([ np.nan ] * n, dtype = np.float32)
         self.pointer = 0
 
     def get_nice_scale_bound(self, value):
@@ -59,20 +59,24 @@ class ScopePlotter(object):
 
         if ymin is None or ymax is None:
             # Autoscale
-            ymax = self.get_nice_scale_bound(np.max(self.data))
+            ymax = self.get_nice_scale_bound(np.nanmax(self.data))
 
-            if np.min(self.data) < 0:
+            if np.nanmin(self.data) < 0:
                 ymin = -ymax
             else:
                 ymin = 0.0
 
         for i in range(len(self.data)):
-           points.append(
-             (int(float(i)/len(self.data)*(self.right - self.left) + self.left),
-             int((1.0 - (self.data[i] - ymin) / (ymax - ymin)) * (self.bottom - self.top) + self.top))
-           )
+           if not np.isnan(self.data[i]):
+               points.append(
+                 (int(float(i)/len(self.data)*(self.right - self.left) + self.left),
+                 int((1.0 - (self.data[i] - ymin) / (ymax - ymin)) * (self.bottom - self.top) + self.top))
+               )
+            
         self.g.set_color(termgraphics.COLOR_WHITE)
-        self.g.points(points)
+        for i in range(len(points) - 1):
+            self.g.line(points[i], points[i+1])
+
         self.g.set_color((127, 127, 127))
         self.g.text("{:2.4f}".format(ymax).rstrip("0").rstrip("."), (int(self.left), int(self.top)))
         self.g.text("{:2.4f}".format((ymax + ymin)/2).rstrip("0").rstrip("."), (int(self.left), int(self.top + (self.bottom - self.top) / 2 )))
