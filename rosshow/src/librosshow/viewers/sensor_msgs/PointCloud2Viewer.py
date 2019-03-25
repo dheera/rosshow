@@ -10,7 +10,7 @@ class PointCloud2Viewer(object):
         self.g = termgraphics.TermGraphics()
         self.scale = 20
         self.spin = 0.0
-        self.tilt = 3.14159 * 2/3
+        self.tilt = np.pi / 3
         self.target_scale = self.scale
         self.target_spin = self.spin
         self.target_tilt = self.tilt
@@ -84,7 +84,8 @@ class PointCloud2Viewer(object):
         h = self.g.shape[1]
         xmax = self.scale
         ymax = xmax * h/w
-        rot_points = np.matmul(self.rotation, points.T).T
+
+        rot_points = np.matmul(self.rotation[0:2,0:3], points.T).T
         screen_is = ((0.5 * w + rot_points[:,0] * self.scale)).astype(np.int16)
         screen_js = ((0.5 * h - rot_points[:,1] * self.scale)).astype(np.int16)
         zmax = np.max(points[:,2])
@@ -95,10 +96,12 @@ class PointCloud2Viewer(object):
         screen_js = screen_js[where_valid]
         screen_c = screen_c[where_valid]
         last_c = None
+        self.g.set_color((255, 255, 255))
         for i in range(screen_is.shape[0]):
-            if screen_c[i] != last_c:
-                self.g.set_color((255, screen_c[i], screen_c[i]))
-                last_c = screen_c[i]
+            # cut the colors temporarily until this can be sped up
+            # if screen_c[i] != last_c:
+            #    self.g.set_color((255 - screen_c[i], 127, screen_c[i]))
+            #    last_c = screen_c[i]
             self.g.point((screen_is[i], screen_js[i]))
 
         if self.title:
