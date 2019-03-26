@@ -8,11 +8,6 @@ import random
 import threading
 from librosshow.getch import Getch
 
-from sensor_msgs.msg import Image
-
-from librosshow.viewers.sensor_msgs.LaserScanViewer import LaserScanViewer
-from sensor_msgs.msg import LaserScan
-
 VIEWER_MAPPING = {
   "std_msgs/Float32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
   "std_msgs/Float64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
