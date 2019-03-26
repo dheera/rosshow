@@ -97,12 +97,8 @@ class PointCloud2Viewer(object):
         screen_c = screen_c[where_valid]
         last_c = None
         self.g.set_color((255, 255, 255))
-        for i in range(screen_is.shape[0]):
-            # cut the colors temporarily until this can be sped up
-            # if screen_c[i] != last_c:
-            #    self.g.set_color((255 - screen_c[i], 127, screen_c[i]))
-            #    last_c = screen_c[i]
-            self.g.point((screen_is[i], screen_js[i]))
+        points = np.vstack((screen_is, screen_js)).T
+        self.g.points(points)
 
         if self.title:
             self.g.set_color((0, 127, 255))

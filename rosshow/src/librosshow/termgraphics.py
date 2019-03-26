@@ -40,7 +40,7 @@ IMAGE_RGB_2X4 = 2
 
 TABLE_EASCII = " '-'.*.|'~/~/F//-\\-~/>-&'\"\"\"/)//.\\\\\\_LLL'\"<C-=CC:\\-\\vD=D|Y|Y|)AH.!i!.ii|/\"/F/Fff//rkfPrkJJ/P/P/P//>brr>kl>&&*=fF/)vb/PPDJ)19/2/R.\\\\\\\\\\\\(=T([(((C=3-5cSct!919|7Ce,\\\\\\_\\\\\\i919i9(C|)\\\\+tv\\|719|7@9_L=L_LLL_=6[CEC[=;==c2ctJ]d=¿Z6E/\\;bsbsbj]SSd=66jj]bddsbJ]j]d]d8"
 
-UNICODE_BRAILLE_MAP= [ \
+UNICODE_BRAILLE_MAP= np.array([ \
     0b00000001,
     0b00001000,
     0b00000010,
@@ -49,7 +49,7 @@ UNICODE_BRAILLE_MAP= [ \
     0b00100000,
     0b01000000,
     0b10000000,
-]
+], dtype = np.uint8)
 
 class TermGraphics(object):
     def __init__(self, mode = MODE_UNICODE):
@@ -101,27 +101,40 @@ class TermGraphics(object):
         """
         Draws a list of points = [(x0,y0), (x1,y1), (x2,y2), ...].
         """
-        for point in points:
-            self.point(point, clear_block = clear_block)
-        for point in points:
-            self.point(point, clear_block = False)
+        if type(points) is list:
+            points = np.array(points, dtype = np.uint16)
+
+        i_array = points[:, 0] >> 1
+        j_array = points[:, 1] >> 2
+
+        where_valid = (i_array >= 0) & (j_array >= 0) & \
+            (i_array < self.term_shape[0]) & (j_array < self.term_shape[1])
+
+        i_array = i_array[where_valid]
+        j_array = j_array[where_valid]
+        points = points[where_valid, :]
+
+        if clear_block:
+            self.buffer[i_array, j_array] = 0x2800
+
+        np.bitwise_or.at(
+            self.buffer,
+            (i_array, j_array),
+            UNICODE_BRAILLE_MAP[(points[:, 0] & 0b1) | ((points[:, 1] & 0b11) << 1)]
+        )
+
+        np.bitwise_and.at(self.buffer, (i_array, j_array), 0x00FF)
+        np.bitwise_or.at(self.buffer, (i_array, j_array), 0x2800)
+
+        self.colors[i_array, j_array, :] = self.current_color
+
 
     def point(self, point, clear_block = False):
         """
         Draw a point at points = (x,y) where x is the column number, y is the row number, and (0,0)
         is the top-left corner of the screen.
         """
-        if type(point[0]) is not int or type(point[1]) is not int:
-            point = (int(point[0]), int(point[1]))
-
-        if point[0] >= 0 and point[1] >= 0 and point[0] < self.shape[0] and point[1] < self.shape[1]:
-            i, j = point[0] >> 1, point[1] >> 2
-            if clear_block:
-                self.buffer[i, j] = 0x2800 | UNICODE_BRAILLE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)]
-            else:
-                self.buffer[i, j] = 0x2800 | (self.buffer[i, j] & 0xFF) | \
-                  UNICODE_BRAILLE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)]
-            self.colors[i, j, :] = self.current_color
+        self.points([point], clear_block = clear_block)
 
     def text(self, text, point):
         """
@@ -133,14 +146,14 @@ class TermGraphics(object):
         text = text[0:self.term_shape[0] - point[0]]
         self.buffer[i:i+len(text), j] = np.frombuffer(text.encode(), dtype = np.uint8)
         self.colors[i:i+len(text), j, :] = self.current_color
-
+    
     def poly(self, points):
         """
         Draws lines between a list of points = [(x0,y0), (x1,y1), (x2,y2), ...].
         """
         for i in range(1, len(points)):
             self.line(points[i-1], points[i])
-
+    
     def line(self, point0, point1):
         """
         Draw a line between point0 = (x0, y0) and point1 = (x1, y1).
@@ -169,7 +182,7 @@ class TermGraphics(object):
                 for y in range(point1[1], point0[1]):
                      self.point((point0[0] + (y - point0[1])/slope, y))
         return
-
+    
     def rect(self, point0, point1):
         """
         Draw a rectangle between corners point0 = (x0, y0) and point1 = (x1, y1).
@@ -178,7 +191,7 @@ class TermGraphics(object):
         self.line((point0[0], point1[1]), (point1[0], point1[1]))
         self.line((point1[0], point1[1]), (point1[0], point0[1]))
         self.line((point1[0], point0[1]), (point0[0], point0[1]))
-
+    
     def image(self, data, width, height, point, image_type = IMAGE_MONOCHROME):
         """
         Draw a binary image with the top-left corner at point = (x0, y0).
@@ -188,30 +201,30 @@ class TermGraphics(object):
                 for j in range(height):
                     if data[j*width + i] > 0:
                         self.point((point[0] + i, point[1] + j))
-
+    
         elif image_type == IMAGE_UINT8:
             for i in range(width):
                 for j in range(height):
                     if data[j*width + i] > 127:
                         self.point((point[0] + i, point[1] + j))
-
+    
         elif image_type == IMAGE_RGB_2X4 and self.mode == MODE_UNICODE:
             for i in range(width):
                 for j in range(height):
                     self.colors[i, j, :] = data[j*width + i]
                     self.buffer[i, j] = 0x2588
-
+    
     def draw(self):
         """
         Shows the graphics buffer on the screen. Must be called in order to see output.
         """
         sys.stdout.write("\033[H")
-
+    
         current_draw_color = -1
-
+    
         for j in range(self.term_shape[1]):
             sys.stdout.write("\033[" + str(j+1) + ";1H")
-
+    
             for i in range(self.term_shape[0]):
                 if np.any(self.colors[i, j, :] != current_draw_color):
                     current_draw_color = self.colors[i, j, :]
@@ -219,9 +232,7 @@ class TermGraphics(object):
                       sys.stdout.write("\033[38;2;{};{};{}m".format(current_draw_color[0], current_draw_color[1], current_draw_color[2]))
                     else:
                       sys.stdout.write("\033[3" + str(self._rgb_to_8(current_draw_color)) + "m")
-                #if False and self.buffer_text[i, j]:
-                #    sys.stdout.write(chr(self.buffer_text[i, j]))
-                #else:
+
                 if self.mode == MODE_UNICODE:
                     sys.stdout.write(unichr(self.buffer[i, j]))
                 elif self.mode == MODE_EASCII:
@@ -240,8 +251,12 @@ if __name__ == '__main__':
     g = TermGraphics()
     for j in range(10):
         g.clear()
+        points = []
         for i in range(300):
+            #points.append((i, int(i*j/5)))
             g.point((i, int(i*j/5)))
+        #g.points(points)
         g.text("hello", (10, 10))
         g.draw()
         time.sleep(0.1)
+
