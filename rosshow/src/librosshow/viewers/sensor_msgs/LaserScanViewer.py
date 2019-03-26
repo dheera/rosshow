@@ -66,4 +66,3 @@ class LaserScanViewer(object):
             self.g.text(self.title, (0, self.g.shape[1] - 4))
         self.g.draw()
 
-        self.g.draw()
