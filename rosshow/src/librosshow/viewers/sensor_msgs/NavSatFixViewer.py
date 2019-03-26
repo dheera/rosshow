@@ -82,18 +82,18 @@ class LocationPlotter(object):
         img = img.resize((width, height), Image.NEAREST)
         self.g.image(list(img.getdata()), img.width, img.height, (0, 0), image_type = termgraphics.IMAGE_UINT8)
 
+        # trail of last few positions
         points = []
-
         for i in range(len(self.data)):
            points.append((
                width * (self.data[i][1] - lon_min) / (lon_max - lon_min),
                height * (self.data[i][0] - lat_min) / (lat_max - lat_min)
            ))
         self.g.set_color(termgraphics.COLOR_WHITE)
-
         self.g.points(points, clear_block = True)
-        self.g.set_color(termgraphics.COLOR_RED)
 
+        # current position
+        self.g.set_color(termgraphics.COLOR_RED)
         for i in range(-1, 2):
             for j in range(-1, 2):
                 self.g.point((

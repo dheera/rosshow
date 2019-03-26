@@ -3,11 +3,14 @@
 
 # By Dheera Venkatraman [ http://dheera.net ]
 # Released under the MIT license.
-# https://github.com/dheera/python-termgraphics
+
+# Modified to use numpy for more efficient processing
+# Original non-numpy version at https://github.com/dheera/python-termgraphics
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import math
+import numpy as np
 import os
 import sys
 import time
@@ -54,11 +57,9 @@ class TermGraphics(object):
         Initialization. This class takes no arguments.
         """
         self.shape = (0, 0)
+        self.term_shape = (0, 0)
         self.update_shape()
-        self.buffer = bytearray(b'\x28\x00' * self.term_shape[0]*self.term_shape[1])
-        self.colors = bytearray(3*self.term_shape[0]*self.term_shape[1])
-        self.buffer_text = bytearray(self.term_shape[0]*self.term_shape[1])
-        self.current_color = (255, 255, 255)
+        self.current_color = np.array([255, 255, 255], dtype = np.uint8)
         self.mode = mode
 
         if self.term_type in ['xterm-256color', 'xterm']:
@@ -73,19 +74,23 @@ class TermGraphics(object):
         """
         Clear the graphics buffer.
         """
-        self.buffer = bytearray(b'\x28\x00' * self.term_shape[0]*self.term_shape[1])
-        self.colors = bytearray(3*self.term_shape[0]*self.term_shape[1])
-        self.buffer_text = bytearray(self.term_shape[0]*self.term_shape[1])
+        self.buffer &= 0
+        self.buffer |= 0x2800
+        self.colors &= 0
+        self.buffer_text &= 0
 
     def update_shape(self):
         """
         Fetches the terminal shape. Returns True if the shape has changed.
         """
-        self.term_shape = list(reversed(list(map(lambda x: int(x), os.popen('stty size', 'r').read().split()))))
+        self.term_shape = tuple(reversed(list(map(lambda x: int(x), os.popen('stty size', 'r').read().split()))))
         self.term_type = os.environ['TERM']
         new_shape = (self.term_shape[0]*2, self.term_shape[1]*4)
         if new_shape != self.shape:
             self.shape = (self.term_shape[0]*2, self.term_shape[1]*4)
+            self.buffer = np.frombuffer((b'\x28\x00' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint16).reshape((self.term_shape[0], self.term_shape[1])).copy()
+            self.colors = np.frombuffer((b'\xff\xff\xff' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint8).reshape((self.term_shape[0], self.term_shape[1], 3)).copy()
+            self.buffer_text = np.frombuffer((b'\x00' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint8).reshape((self.term_shape[0], self.term_shape[1])).copy()
             return True
         return False
 
@@ -110,25 +115,24 @@ class TermGraphics(object):
             point = (int(point[0]), int(point[1]))
 
         if point[0] >= 0 and point[1] >= 0 and point[0] < self.shape[0] and point[1] < self.shape[1]:
-            index = ((point[0] >> 1) + (point[1] >> 2) * self.term_shape[0])
-            self.buffer[2*index] = 0x28
+            i, j = point[0] >> 1, point[1] >> 2
             if clear_block:
-                self.buffer[2*index+1] = UNICODE_BRAILLE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)]
+                self.buffer[i, j] = 0x2800 | UNICODE_BRAILLE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)]
             else:
-                self.buffer[2*index+1] = self.buffer[2*index+1] | \
+                self.buffer[i, j] = 0x2800 | (self.buffer[i, j] & 0xFF) | \
                   UNICODE_BRAILLE_MAP[(point[0] & 0b1) | ((point[1] & 0b11) << 1)]
-            self.colors[3*index:3*index+3] = self.current_color
+            self.colors[i, j, :] = self.current_color
 
     def text(self, text, point):
         """
         Draws text at point = (x0, y0).
         """
-        text = text[0:self.term_shape[0] - int(point[0] >> 2)]
-        index = ((point[0] >> 1) + (point[1] >> 2) * self.term_shape[0])
-        for i in range(len(text)):
-            if index + i < len(self.buffer_text):
-                self.buffer_text[index + i] = ord(text[i])
-                self.colors[3*(index + i):3*(index+i)+3] = self.current_color
+        i, j = point[0] >> 1, point[1] >> 2
+        if j >= self.term_shape[1]:
+            return
+        text = text[0:self.term_shape[0] - point[0]]
+        self.buffer[i:i+len(text), j] = np.frombuffer(text.encode(), dtype = np.uint8)
+        self.colors[i:i+len(text), j, :] = self.current_color
 
     def poly(self, points):
         """
@@ -194,16 +198,8 @@ class TermGraphics(object):
         elif image_type == IMAGE_RGB_2X4 and self.mode == MODE_UNICODE:
             for i in range(width):
                 for j in range(height):
-                    index = i + j*self.term_shape[0]
-                    self.colors[3*index:3*index+3] = data[j*width + i]
-                    self.buffer[2*index:2*index+2] = 0x25, 0x88
-
-        elif image_type == IMAGE_RGB_2X4 and self.mode == MODE_UNICODE:
-            for i in range(width):
-                for j in range(height):
-                    index = i + j*self.term_shape[0]
-                    self.colors[3*index:3*index+3] = data[j*width + i]
-                    self.buffer[2*index:2*index+2] = 0x00, 0x88
+                    self.colors[i, j, :] = data[j*width + i]
+                    self.buffer[i, j] = 0x2588
 
     def draw(self):
         """
@@ -217,25 +213,24 @@ class TermGraphics(object):
             sys.stdout.write("\033[" + str(j+1) + ";1H")
 
             for i in range(self.term_shape[0]):
-                index = i + j*self.term_shape[0]
-                if self.colors[3*index:3*index+3] != current_draw_color:
-                    current_draw_color = self.colors[3*index:3*index+3]
+                if np.any(self.colors[i, j, :] != current_draw_color):
+                    current_draw_color = self.colors[i, j, :]
                     if self.color_support == COLOR_SUPPORT_256:
                       sys.stdout.write("\033[38;2;{};{};{}m".format(current_draw_color[0], current_draw_color[1], current_draw_color[2]))
                     else:
                       sys.stdout.write("\033[3" + str(self._rgb_to_8(current_draw_color)) + "m")
-                if self.buffer_text[index]:
-                    sys.stdout.write(chr(self.buffer_text[index]))
-                else:
-                    if self.mode == MODE_UNICODE:
-                        sys.stdout.write(unichr(self.buffer[2*index]<<8 | self.buffer[2*index+1]))
-                    elif self.mode == MODE_EASCII:
-                        if self.buffer[2*index] == 0x28:
-                            sys.stdout.write(TABLE_EASCII[self.buffer[2*index + 1]])
-                        elif self.buffer[2*index] == 0x00 and self.buffer[2*index + 1] != 0x00:
-                            sys.stdout.write(TABLE_EASCII[self.buffer[2*index + 1]])
-                        else:
-                            sys.stdout.write(0x20)
+                #if False and self.buffer_text[i, j]:
+                #    sys.stdout.write(chr(self.buffer_text[i, j]))
+                #else:
+                if self.mode == MODE_UNICODE:
+                    sys.stdout.write(unichr(self.buffer[i, j]))
+                elif self.mode == MODE_EASCII:
+                    if self.buffer[i, j] & 0xFF00 == 0x2800:
+                        sys.stdout.write(TABLE_EASCII[self.buffer[i, j] & 0x00FF])
+                    elif self.buffer[i, j] & 0xFF00 == 0x00 and self.buffer[i, j] & 0x00FF != 0x00:
+                        sys.stdout.write(self.buffer[i, j])
+                    else:
+                        sys.stdout.write(0x20)
         sys.stdout.write("\033[37m")
         sys.stdout.flush()
 
