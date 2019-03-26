@@ -1,4 +1,4 @@
-import math
+import numpy as np
 import time
 
 import librosshow.termgraphics as termgraphics
@@ -52,17 +52,25 @@ class LaserScanViewer(object):
         xmax = self.scale
         ymax = self.scale * h/w
 
-        for n in range(len(self.msg.ranges)):
-            if math.isinf(self.msg.ranges[n]) or math.isnan(self.msg.ranges[n]):
-                continue
-            x = self.msg.ranges[n]*math.cos(self.msg.angle_min + n*self.msg.angle_increment)
-            y = self.msg.ranges[n]*math.sin(self.msg.angle_min + n*self.msg.angle_increment)
-            i = int(w * (x + xmax) / (2 * xmax))
-            j = int(h * (1 - (y + ymax) / (2 * ymax)))
-            self.g.point((i, j))
+        angles = np.linspace(self.msg.angle_min, self.msg.angle_max, len(self.msg.ranges), dtype = np.float32)
+        ranges = np.array(self.msg.ranges, dtype = np.float32)
+        x = ranges * np.cos(angles)
+        y = ranges * np.sin(angles)
+        screen_is = (w * (x + xmax) / (2 * xmax)).astype(np.uint16)
+        screen_js = (h * (1 - (y + ymax) / (2 * ymax))).astype(np.uint16)
+
+        where_valid = ~np.isnan(angles) & ~np.isnan(ranges) & \
+                (screen_is > 0) & (screen_js > 0) & \
+                (screen_is < w) & (screen_js < h)
+        screen_is = screen_is[where_valid]
+        screen_js = screen_js[where_valid]
+
+        points = np.vstack((screen_is, screen_js)).T
+        self.g.points(points)
 
         if self.title:
             self.g.set_color((0, 127, 255))
             self.g.text(self.title, (0, self.g.shape[1] - 4))
         self.g.draw()
+
 
