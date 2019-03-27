@@ -295,12 +295,12 @@ class TermGraphics(object):
             if self.mode == MODE_UNICODE:
                 sys.stdout.write(unichr(b))
             elif self.mode == MODE_EASCII:
-                if b[i, j] & 0xFF00 == 0x2800:
-                    sys.stdout.write(TABLE_EASCII[b[i, j] & 0x00FF])
-                elif b[i, j] == 0x2588:
+                if b & 0xFF00 == 0x2800:
+                    sys.stdout.write(TABLE_EASCII[b & 0x00FF])
+                elif b == 0x2588:
                     sys.stdout.write("#")
-                elif b[i, j] & 0xFF00 == 0x00 and b[i, j] & 0x00FF != 0x00:
-                    sys.stdout.write(chr(b[i, j] & 0x00FF))
+                elif b & 0xFF00 == 0x00 and b & 0x00FF != 0x00:
+                    sys.stdout.write(chr(b & 0x00FF))
                 else:
                     sys.stdout.write(0x20)
 
