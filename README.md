@@ -39,6 +39,11 @@ If you're using it from a catkin workspace:
 rosrun rosshow rosshow <topicname>
 ```
 
+Most visualizations use Unicode Braille characters to render visualizations. If your terminal supports only ASCII, you can use the `-a` option for a purely ASCII-art render:
+```
+rosshow -a <topicname>
+```
+
 # Screenshots
 
 ## sensor_msgs/PointCloud2
