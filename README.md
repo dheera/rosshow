@@ -5,7 +5,7 @@ what they should, e.g. ```rostopic echo /camera/image_raw```?
 
 If so, rosshow is for you.
 
-This displays various sensor messages in a useful fashion using Unicode Braille art in the terminal so you don't need to fire up port forwards, rviz, or any other shenanigans just to see if something is working. It currently only supports a few types (Image, Imu, NavSatFix, LaserScan) but support for more types is coming. Contributions welcome!
+This displays various sensor messages in a useful fashion using Unicode Braille art in the terminal so you don't need to fire up port forwards, rviz, or any other shenanigans just to see if something is working. It currently only supports types from std_msgs and sensor_msgs but support for more types is coming. Contributions welcome!
 
 # Installation
 
