@@ -8,12 +8,13 @@ import librosshow.termgraphics as termgraphics
 class PointCloud2Viewer(object):
     def __init__(self, canvas, title = ""):
         self.g = canvas
-        self.scale = 20
+        self.scale = 500.0
         self.spin = 0.0
         self.tilt = np.pi / 3
         self.target_scale = self.scale
         self.target_spin = self.spin
         self.target_tilt = self.tilt
+        self.camera_distance = 50.0
         self.target_time = 0
         self.calculate_rotation()
         self.msg = None
@@ -85,17 +86,33 @@ class PointCloud2Viewer(object):
         xmax = self.scale
         ymax = xmax * h/w
 
-        rot_points = np.matmul(self.rotation[0:2,0:3], points.T).T
-        screen_is = ((0.5 * w + rot_points[:,0] * self.scale)).astype(np.int16)
-        screen_js = ((0.5 * h - rot_points[:,1] * self.scale)).astype(np.int16)
-        zmax = np.max(points[:,2])
-        zmin = np.min(points[:,2])
-        screen_c = np.clip((255.0 / 8 * (points[:,2] + 5)), 0.0, 255.0).astype(np.uint8)
+        # the xyz coordinates rotated to the camera's frame
+        rot_points = np.matmul(self.rotation, points.T).T.astype(np.float32)
+
+        # cutoff points less than 1m from camera
+        where_visible = rot_points[:,2] > -self.camera_distance + 1.0 
+
+        # points in front of camera (throw away points behind)
+        rot_points_visible = rot_points[where_visible, :]
+        points_visible = points[where_visible, :]
+        rot_points_visible[:,0] /= rot_points_visible[:,2] + self.camera_distance
+        rot_points_visible[:,1] /= rot_points_visible[:,2] + self.camera_distance
+
+        # compute screen coordinates
+        screen_is = ((0.5 * w + rot_points_visible[:,0] * self.scale)).astype(np.int16)
+        screen_js = ((0.5 * h - rot_points_visible[:,1] * self.scale)).astype(np.int16)
+
+        # compute display colors
+        screen_c = np.clip((255.0 / 8 * (points_visible[:,2] + 5)), 0.0, 255.0).astype(np.uint8)
         screen_c = np.vstack((255 - screen_c, screen_c * 0, screen_c)).T
+
+        # filter for only points on-screen
         where_valid = (screen_is > 0) & (screen_js > 0) & (screen_is < w) & (screen_js < h)
         screen_is = screen_is[where_valid]
         screen_js = screen_js[where_valid]
         screen_c = screen_c[where_valid, :]
+
+        # display it
         self.g.set_color((255, 255, 255))
         points = np.vstack((screen_is, screen_js)).T
         self.g.points(points, colors = screen_c)
