@@ -44,8 +44,8 @@ class ImuViewer(object):
             top = 3*vmargin + 2*vsize,
             right = hmargin + hsize,
             bottom = 3*vmargin + 3*vsize,
-            ymin = 0,
-            ymax = 2*math.pi,
+            ymin = -math.pi,
+            ymax = math.pi,
         )
 
         self.avx_scope_plotter = ScopePlotter(self.g,
@@ -102,15 +102,22 @@ class ImuViewer(object):
             ymax = 9.8,
         )
 
+    def keypress(self, c):
+        return
+
     def update(self, data):
-        a = data.orientation.x / 16384.
-        b = data.orientation.y / 16384.
-        c = data.orientation.z / 16384.
-        d = data.orientation.w / 16384.
+        # quaternion to euler
+        norm = (data.orientation.x ** 2 + data.orientation.y ** 2 + data.orientation.z ** 2 + data.orientation.w ** 2) ** 0.5
+        a = data.orientation.x / norm
+        b = data.orientation.y / norm
+        c = data.orientation.z / norm
+        d = data.orientation.w / norm
 
         yaw = math.atan2(2*a*b+2*c*d, 1-2*b*b-2*c*c)
         pitch = math.asin(2*(a*c-b*d))
         roll = math.atan2(2*a*d+2*b*c, 1-2*c*c-2*d*d)+math.pi
+        if roll > math.pi:
+            roll -= 2*math.pi
 
         self.yaw_scope_plotter.update(yaw)
         self.pitch_scope_plotter.update(pitch)
