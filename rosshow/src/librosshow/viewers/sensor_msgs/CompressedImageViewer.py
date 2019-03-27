@@ -1,7 +1,7 @@
 import io
 import numpy as np
 import time
-import scipy.misc
+import PIL.Image
 import librosshow.termgraphics as termgraphics
 
 try:
@@ -42,10 +42,7 @@ class CompressedImageViewer(object):
 
         current_image_obj = PIL.Image.open(io.BytesIO(self.msg.data))
 
-        current_image = np.fromstring(current_image_obj.tobytes(), dtype=np.uint8)
-        current_image = current_image.reshape((current_image_obj.size[1], current_image_obj.size[0], 3))    
-
-        image_ratio = 0.5 * float(current_image.shape[0]) / current_image.shape[1] # height / width
+        image_ratio = 0.5 * float(current_image_obj.size[1]) / current_image_obj.size[0] # height / width
         terminal_ratio = 0.5 * float(h) / w  # height / width
         if image_ratio > terminal_ratio:
            target_image_height = int(h / 4.0)
@@ -54,12 +51,12 @@ class CompressedImageViewer(object):
            target_image_width = int(w / 2.0)
            target_image_height = int(image_ratio * target_image_width)
 
-        resized_image = list(map(tuple, scipy.misc.imresize(current_image, \
-                (target_image_height, target_image_width)).reshape((target_image_width * target_image_height, 3))))
+        resized_image_obj = current_image_obj.resize((target_image_width, target_image_height), PIL.Image.BILINEAR)
+        resized_image = np.fromstring(resized_image_obj.tobytes(), dtype = np.uint8).reshape(target_image_width, target_image_height, 3)
 
         self.g.image(resized_image, target_image_width, target_image_height, (0, 0), image_type = termgraphics.IMAGE_RGB_2X4)
-        if self.title:
-            self.g.set_color((0, 127, 255))
-            self.g.text(self.title, (0, self.g.shape[1] - 4))
+
+        self.g.set_color((0, 127, 255))
+        self.g.text(self.title, (0, self.g.shape[1] - 4))
         self.g.draw()
         self.last_update_time = time.time()
