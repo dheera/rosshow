@@ -77,3 +77,30 @@ You can zoom with the \[ and \] keys. (TODO: Arrow key support).
 For most std_msgs numeric types you will get a time series plot.
 
 ![screenshot](/screenshot6.png?raw=true "screenshot")
+
+# Full list of supported types
+
+### std_msgs
+* std_msgs/Float32
+* std_msgs/Float64
+* std_msgs/Int8
+* std_msgs/Int16
+* std_msgs/Int32
+* std_msgs/Int64
+* std_msgs/UInt8
+* std_msgs/UInt16
+* std_msgs/UInt32
+* std_msgs/UInt64
+
+### sensor_msgs
+* sensor_msgs/CompressedImage
+* sensor_msgs/FluidPressure
+* sensor_msgs/Illuminance
+* sensor_msgs/Image
+* sensor_msgs/Imu
+* sensor_msgs/LaserScan
+* sensor_msgs/NavSatFix
+* sensor_msgs/PointCloud2
+* sensor_msgs/Range
+* sensor_msgs/RelativeHumidity
+* sensor_msgs/Temperature
