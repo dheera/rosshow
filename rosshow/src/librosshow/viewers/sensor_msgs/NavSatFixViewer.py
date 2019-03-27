@@ -3,6 +3,7 @@
 import functools
 from io import BytesIO
 import math
+import numpy as np
 import requests
 import time
 import librosshow.termgraphics as termgraphics
@@ -80,7 +81,7 @@ class LocationPlotter(object):
         self.g.set_color(termgraphics.COLOR_BLUE)
 
         img = img.resize((width, height), Image.NEAREST)
-        self.g.image(list(img.getdata()), img.width, img.height, (0, 0), image_type = termgraphics.IMAGE_UINT8)
+        self.g.image(np.array(img.getdata(), dtype = np.uint8) >> 7, img.width, img.height, (0, 0), image_type = termgraphics.IMAGE_MONOCHROME)
 
         # trail of last few positions
         points = []

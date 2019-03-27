@@ -197,16 +197,40 @@ class TermGraphics(object):
         Draw a binary image with the top-left corner at point = (x0, y0).
         """
         if image_type == IMAGE_MONOCHROME:
-            for i in range(width):
-                for j in range(height):
-                    if data[j*width + i] > 0:
-                        self.point((point[0] + i, point[1] + j))
+            img = np.reshape(data, (height, width))
+            screen_is, screen_js = np.meshgrid(np.arange(img.shape[1]), np.arange(img.shape[0]))
+            screen_is += point[0]
+            screen_js += point[1]
+            where_valid = (screen_is >= 0) & (screen_js >= 0) & \
+                (screen_is < self.shape[0]) & (screen_js < self.shape[1]) & \
+                (img > 0)
+            screen_is = screen_is[where_valid]
+            screen_js = screen_js[where_valid]
+            self.points(np.vstack((screen_is, screen_js)).T)
     
         elif image_type == IMAGE_UINT8:
-            for i in range(width):
-                for j in range(height):
-                    if data[j*width + i] > 127:
-                        self.point((point[0] + i, point[1] + j))
+            img = np.reshape(data, (height, width))
+            screen_is, screen_js = np.meshgrid(np.arange(img.shape[1]), np.arange(img.shape[0]))
+            screen_is += point[0]
+            screen_js += point[1]
+            where_valid = (screen_is >= 0) & (screen_js >= 0) & \
+                (screen_is < self.shape[0]) & (screen_js < self.shape[1])
+            screen_is = screen_is[where_valid]
+            screen_js = screen_js[where_valid]
+            img = img[where_valid]
+            self.points(np.vstack((screen_is, screen_js)).T)
+            np.bitwise_and.at(self.colors,
+                (screen_is >> 1, screen_js >> 2),
+                0)
+            np.bitwise_or.at(self.colors,
+                (screen_is >> 1, screen_js >> 2, 0),
+                img * self.current_color[0])
+            np.bitwise_or.at(self.colors,
+                (screen_is >> 1, screen_js >> 2, 1),
+                img * self.current_color[1])
+            np.bitwise_or.at(self.colors,
+                (screen_is >> 1, screen_js >> 2, 2),
+                img * self.current_color[2])
     
         elif image_type == IMAGE_RGB_2X4 and self.mode == MODE_UNICODE:
             img = np.reshape(data, (height, width, 3))
