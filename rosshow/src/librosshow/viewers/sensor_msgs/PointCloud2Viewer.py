@@ -11,10 +11,11 @@ class PointCloud2Viewer(object):
         self.scale = 500.0
         self.spin = 0.0
         self.tilt = np.pi / 3
+        self.camera_distance = 50.0
         self.target_scale = self.scale
         self.target_spin = self.spin
         self.target_tilt = self.tilt
-        self.camera_distance = 50.0
+        self.target_camera_distance = self.camera_distance
         self.target_time = 0
         self.calculate_rotation()
         self.msg = None
@@ -23,9 +24,13 @@ class PointCloud2Viewer(object):
 
     def keypress(self, c):
         if c == "+" or c == "=":
-            self.target_scale *= 1.5
+            self.target_camera_distance /= 1.5
         elif c == "-":
+            self.target_camera_distance *= 1.5
+        elif c == "[":
             self.target_scale /= 1.5
+        elif c == "]" or c == "=":
+            self.target_scale *= 1.5
         elif c == "left":
             self.target_spin -= 0.1
         elif c == "right":
@@ -67,16 +72,18 @@ class PointCloud2Viewer(object):
             self.last_update_shape_time = t
 
         # animation over 0.5s when zooming in/out
-        if self.scale != self.target_scale or self.tilt != self.target_tilt or self.spin != self.target_spin:
+        if self.scale != self.target_scale or self.tilt != self.target_tilt or self.spin != self.target_spin or self.camera_distance != self.target_camera_distance:
             animation_fraction = (time.time() - self.target_time) / 1.0
             if animation_fraction > 1.0:
                 self.scale = self.target_scale
                 self.tilt = self.target_tilt
                 self.spin = self.target_spin
+                self.camera_distance = self.target_camera_distance
             else:
                 self.scale = (1 - animation_fraction) * self.scale + animation_fraction * self.target_scale
                 self.tilt = (1 - animation_fraction) * self.tilt + animation_fraction * self.target_tilt
                 self.spin = (1 - animation_fraction) * self.spin + animation_fraction * self.target_spin
+                self.camera_distance = (1 - animation_fraction) * self.camera_distance + animation_fraction * self.target_camera_distance
             self.calculate_rotation()
 
         points = np.array(list(pcl2.read_points(self.msg, skip_nans = True, field_names = ("x", "y", "z"))), dtype = np.float16)
