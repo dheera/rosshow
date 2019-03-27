@@ -97,7 +97,7 @@ class TermGraphics(object):
     def set_color(self, color):
         self.current_color = color
 
-    def points(self, points, clear_block = False):
+    def points(self, points, colors = None, clear_block = False):
         """
         Draws a list of points = [(x0,y0), (x1,y1), (x2,y2), ...].
         """
@@ -113,6 +113,8 @@ class TermGraphics(object):
         i_array = i_array[where_valid]
         j_array = j_array[where_valid]
         points = points[where_valid, :]
+        if colors is not None:
+            colors = colors[where_valid, :]
 
         if clear_block:
             self.buffer[i_array, j_array] = 0x2800
@@ -126,7 +128,10 @@ class TermGraphics(object):
         np.bitwise_and.at(self.buffer, (i_array, j_array), 0x00FF)
         np.bitwise_or.at(self.buffer, (i_array, j_array), 0x2800)
 
-        self.colors[i_array, j_array, :] = self.current_color
+        if colors is not None:
+            self.colors[i_array, j_array, :] = colors
+        else:
+            self.colors[i_array, j_array, :] = self.current_color
 
 
     def point(self, point, clear_block = False):

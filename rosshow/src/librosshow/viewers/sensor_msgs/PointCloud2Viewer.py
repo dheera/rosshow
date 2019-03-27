@@ -90,15 +90,15 @@ class PointCloud2Viewer(object):
         screen_js = ((0.5 * h - rot_points[:,1] * self.scale)).astype(np.int16)
         zmax = np.max(points[:,2])
         zmin = np.min(points[:,2])
-        screen_c =  np.clip((255.0 / 8 * (points[:,2] + 5)), 0.0, 255.0).astype(np.uint8)
+        screen_c = np.clip((255.0 / 8 * (points[:,2] + 5)), 0.0, 255.0).astype(np.uint8)
+        screen_c = np.vstack((255 - screen_c, screen_c * 0, screen_c)).T
         where_valid = (screen_is > 0) & (screen_js > 0) & (screen_is < w) & (screen_js < h)
         screen_is = screen_is[where_valid]
         screen_js = screen_js[where_valid]
-        screen_c = screen_c[where_valid]
-        last_c = None
+        screen_c = screen_c[where_valid, :]
         self.g.set_color((255, 255, 255))
         points = np.vstack((screen_is, screen_js)).T
-        self.g.points(points)
+        self.g.points(points, colors = screen_c)
 
         if self.title:
             self.g.set_color((0, 127, 255))
