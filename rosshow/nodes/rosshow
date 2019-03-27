@@ -120,7 +120,11 @@ if __name__ == "__main__":
         while not rospy.is_shutdown():
             rate.sleep()
             viewer.draw()
+    except rospy.exceptions.ROSInterruptException:
+        sys.stdout.write("")
+
     finally:
         getch.reset()
-        print("\n" * 25)
+        sys.stdout.write("\033[%d;0H\n" % canvas.term_shape[1])
+        sys.stdout.flush()
 
