@@ -88,9 +88,9 @@ class TermGraphics(object):
         new_shape = (self.term_shape[0]*2, self.term_shape[1]*4)
         if new_shape != self.shape:
             self.shape = (self.term_shape[0]*2, self.term_shape[1]*4)
-            self.buffer = np.frombuffer((b'\x28\x00' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint16).reshape((self.term_shape[0], self.term_shape[1])).copy()
-            self.colors = np.frombuffer((b'\xff\xff\xff' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint8).reshape((self.term_shape[0], self.term_shape[1], 3)).copy()
-            self.jgrid, self.igrid = np.meshgrid(np.arange(self.buffer.shape[1]), np.arange(self.buffer.shape[0]))
+            self.buffer = np.frombuffer((b'\x28\x00' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint16).reshape((self.term_shape[1], self.term_shape[0])).copy()
+            self.colors = np.frombuffer((b'\xff\xff\xff' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint8).reshape((self.term_shape[1], self.term_shape[0], 3)).copy()
+            self.igrid, self.jgrid = np.meshgrid(np.arange(self.buffer.shape[1]), np.arange(self.buffer.shape[0]))
             self.last_buffer = None
             self.last_colors = None
             return True
@@ -119,21 +119,21 @@ class TermGraphics(object):
             colors = colors[where_valid, :]
 
         if clear_block:
-            self.buffer[i_array, j_array] = 0x2800
+            self.buffer[j_array, i_array] = 0x2800
 
         np.bitwise_or.at(
             self.buffer,
-            (i_array, j_array),
+            (j_array, i_array),
             UNICODE_BRAILLE_MAP[(points[:, 0] & 0b1) | ((points[:, 1] & 0b11) << 1)]
         )
 
-        np.bitwise_and.at(self.buffer, (i_array, j_array), 0x00FF)
-        np.bitwise_or.at(self.buffer, (i_array, j_array), 0x2800)
+        np.bitwise_and.at(self.buffer, (j_array, i_array), 0x00FF)
+        np.bitwise_or.at(self.buffer, (j_array, i_array), 0x2800)
 
         if colors is not None:
-            self.colors[i_array, j_array, :] = colors
+            self.colors[j_array, i_array, :] = colors
         else:
-            self.colors[i_array, j_array, :] = self.current_color
+            self.colors[j_array, i_array, :] = self.current_color
 
 
     def point(self, point, clear_block = False):
@@ -151,8 +151,8 @@ class TermGraphics(object):
         if j >= self.term_shape[1]:
             return
         text = text[0:self.term_shape[0] - point[0]]
-        self.buffer[i:i+len(text), j] = np.frombuffer(text.encode(), dtype = np.uint8)
-        self.colors[i:i+len(text), j, :] = self.current_color
+        self.buffer[j, i:i+len(text)] = np.frombuffer(text.encode(), dtype = np.uint8)
+        self.colors[j, i:i+len(text), :] = self.current_color
     
     def poly(self, points):
         """
@@ -211,32 +211,32 @@ class TermGraphics(object):
             where_valid = (screen_is >= 0) & (screen_js >= 0) & \
                 (screen_is < self.shape[0]) & (screen_js < self.shape[1]) & \
                 (img > 0)
-            screen_is = screen_is[where_valid]
             screen_js = screen_js[where_valid]
+            screen_is = screen_is[where_valid]
             self.points(np.vstack((screen_is, screen_js)).T)
     
         elif image_type == IMAGE_UINT8:
             img = np.reshape(data, (height, width))
             screen_is, screen_js = np.meshgrid(np.arange(img.shape[1]), np.arange(img.shape[0]))
-            screen_is += point[0]
             screen_js += point[1]
+            screen_is += point[0]
             where_valid = (screen_is >= 0) & (screen_js >= 0) & \
                 (screen_is < self.shape[0]) & (screen_js < self.shape[1])
-            screen_is = screen_is[where_valid]
             screen_js = screen_js[where_valid]
+            screen_is = screen_is[where_valid]
             img = img[where_valid]
             self.points(np.vstack((screen_is, screen_js)).T)
             np.bitwise_and.at(self.colors,
-                (screen_is >> 1, screen_js >> 2),
+                (screen_js >> 2, screen_is >> 1),
                 0)
             np.bitwise_or.at(self.colors,
-                (screen_is >> 1, screen_js >> 2, 0),
+                (screen_js >> 2, screen_is >> 1, 0),
                 img * self.current_color[0])
             np.bitwise_or.at(self.colors,
-                (screen_is >> 1, screen_js >> 2, 1),
+                (screen_js >> 2, screen_is >> 1, 1),
                 img * self.current_color[1])
             np.bitwise_or.at(self.colors,
-                (screen_is >> 1, screen_js >> 2, 2),
+                (screen_js >> 2, screen_is >> 1, 2),
                 img * self.current_color[2])
     
         elif image_type == IMAGE_RGB_2X4:
@@ -249,8 +249,8 @@ class TermGraphics(object):
             screen_is = screen_is[where_valid]
             screen_js = screen_js[where_valid]
             img = img[where_valid]
-            self.buffer[screen_is, screen_js] = 0x2588
-            self.colors[screen_is, screen_js, :] = img
+            self.buffer[screen_js, screen_is] = 0x2588
+            self.colors[screen_js, screen_is, :] = img
     
     def draw(self):
         """
