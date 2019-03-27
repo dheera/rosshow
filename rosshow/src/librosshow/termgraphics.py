@@ -150,7 +150,7 @@ class TermGraphics(object):
         i, j = point[0] >> 1, point[1] >> 2
         if j >= self.term_shape[1]:
             return
-        text = text[0:self.term_shape[0] - point[0]]
+        text = text[0:self.term_shape[0] - i]
         self.buffer[j, i:i+len(text)] = np.frombuffer(text.encode(), dtype = np.uint8)
         self.colors[j, i:i+len(text), :] = self.current_color
     
