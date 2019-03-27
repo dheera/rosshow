@@ -15,10 +15,10 @@ class LaserScanViewer(object):
 
     def keypress(self, c):
         if c == "+" or c == "=":
-            self.target_scale *= 1.5
+            self.target_scale /= 1.5
             self.target_scale_time = time.time()
         elif c == "-":
-            self.target_scale /= 1.5
+            self.target_scale += 1.5
             self.target_scale_time = time.time()
 
     def update(self, msg):
