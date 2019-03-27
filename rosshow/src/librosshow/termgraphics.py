@@ -61,6 +61,7 @@ class TermGraphics(object):
         self.update_shape()
         self.current_color = np.array([255, 255, 255], dtype = np.uint8)
         self.mode = mode
+        self.seq = 0
 
         if self.term_type in ['xterm-256color', 'xterm']:
           self.color_support = COLOR_SUPPORT_256
@@ -77,7 +78,6 @@ class TermGraphics(object):
         self.buffer &= 0
         self.buffer |= 0x2800
         self.colors &= 0
-        self.buffer_text &= 0
 
     def update_shape(self):
         """
@@ -88,9 +88,11 @@ class TermGraphics(object):
         new_shape = (self.term_shape[0]*2, self.term_shape[1]*4)
         if new_shape != self.shape:
             self.shape = (self.term_shape[0]*2, self.term_shape[1]*4)
-            self.buffer = np.frombuffer((b'\x28\x00' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint16).reshape((self.term_shape[0], self.term_shape[1])).copy()
-            self.colors = np.frombuffer((b'\xff\xff\xff' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint8).reshape((self.term_shape[0], self.term_shape[1], 3)).copy()
-            self.buffer_text = np.frombuffer((b'\x00' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint8).reshape((self.term_shape[0], self.term_shape[1])).copy()
+            self.buffer = np.frombuffer((b'\x28\x00' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint16).reshape((self.term_shape[1], self.term_shape[0])).copy()
+            self.colors = np.frombuffer((b'\xff\xff\xff' * (self.term_shape[0] * self.term_shape[1])), dtype = np.uint8).reshape((self.term_shape[1], self.term_shape[0], 3)).copy()
+            self.igrid, self.jgrid = np.meshgrid(np.arange(self.buffer.shape[1]), np.arange(self.buffer.shape[0]))
+            self.last_buffer = None
+            self.last_colors = None
             return True
         return False
 
@@ -117,21 +119,21 @@ class TermGraphics(object):
             colors = colors[where_valid, :]
 
         if clear_block:
-            self.buffer[i_array, j_array] = 0x2800
+            self.buffer[j_array, i_array] = 0x2800
 
         np.bitwise_or.at(
             self.buffer,
-            (i_array, j_array),
+            (j_array, i_array),
             UNICODE_BRAILLE_MAP[(points[:, 0] & 0b1) | ((points[:, 1] & 0b11) << 1)]
         )
 
-        np.bitwise_and.at(self.buffer, (i_array, j_array), 0x00FF)
-        np.bitwise_or.at(self.buffer, (i_array, j_array), 0x2800)
+        np.bitwise_and.at(self.buffer, (j_array, i_array), 0x00FF)
+        np.bitwise_or.at(self.buffer, (j_array, i_array), 0x2800)
 
         if colors is not None:
-            self.colors[i_array, j_array, :] = colors
+            self.colors[j_array, i_array, :] = colors
         else:
-            self.colors[i_array, j_array, :] = self.current_color
+            self.colors[j_array, i_array, :] = self.current_color
 
 
     def point(self, point, clear_block = False):
@@ -149,8 +151,8 @@ class TermGraphics(object):
         if j >= self.term_shape[1]:
             return
         text = text[0:self.term_shape[0] - point[0]]
-        self.buffer[i:i+len(text), j] = np.frombuffer(text.encode(), dtype = np.uint8)
-        self.colors[i:i+len(text), j, :] = self.current_color
+        self.buffer[j, i:i+len(text)] = np.frombuffer(text.encode(), dtype = np.uint8)
+        self.colors[j, i:i+len(text), :] = self.current_color
     
     def poly(self, points):
         """
@@ -209,32 +211,32 @@ class TermGraphics(object):
             where_valid = (screen_is >= 0) & (screen_js >= 0) & \
                 (screen_is < self.shape[0]) & (screen_js < self.shape[1]) & \
                 (img > 0)
-            screen_is = screen_is[where_valid]
             screen_js = screen_js[where_valid]
+            screen_is = screen_is[where_valid]
             self.points(np.vstack((screen_is, screen_js)).T)
     
         elif image_type == IMAGE_UINT8:
             img = np.reshape(data, (height, width))
             screen_is, screen_js = np.meshgrid(np.arange(img.shape[1]), np.arange(img.shape[0]))
-            screen_is += point[0]
             screen_js += point[1]
+            screen_is += point[0]
             where_valid = (screen_is >= 0) & (screen_js >= 0) & \
                 (screen_is < self.shape[0]) & (screen_js < self.shape[1])
-            screen_is = screen_is[where_valid]
             screen_js = screen_js[where_valid]
+            screen_is = screen_is[where_valid]
             img = img[where_valid]
             self.points(np.vstack((screen_is, screen_js)).T)
             np.bitwise_and.at(self.colors,
-                (screen_is >> 1, screen_js >> 2),
+                (screen_js >> 2, screen_is >> 1),
                 0)
             np.bitwise_or.at(self.colors,
-                (screen_is >> 1, screen_js >> 2, 0),
+                (screen_js >> 2, screen_is >> 1, 0),
                 img * self.current_color[0])
             np.bitwise_or.at(self.colors,
-                (screen_is >> 1, screen_js >> 2, 1),
+                (screen_js >> 2, screen_is >> 1, 1),
                 img * self.current_color[1])
             np.bitwise_or.at(self.colors,
-                (screen_is >> 1, screen_js >> 2, 2),
+                (screen_js >> 2, screen_is >> 1, 2),
                 img * self.current_color[2])
     
         elif image_type == IMAGE_RGB_2X4:
@@ -247,42 +249,69 @@ class TermGraphics(object):
             screen_is = screen_is[where_valid]
             screen_js = screen_js[where_valid]
             img = img[where_valid]
-            self.buffer[screen_is, screen_js] = 0x2588
-            self.colors[screen_is, screen_js, :] = img
+            self.buffer[screen_js, screen_is] = 0x2588
+            self.colors[screen_js, screen_is, :] = img
     
     def draw(self):
         """
         Shows the graphics buffer on the screen. Must be called in order to see output.
         """
+
+        self.seq += 1
+
         sys.stdout.write("\033[H")
     
         current_draw_color = -1
-    
-        for j in range(self.term_shape[1]):
-            sys.stdout.write("\033[" + str(j+1) + ";1H")
-    
-            for i in range(self.term_shape[0]):
-                if np.any(self.colors[i, j, :] != current_draw_color):
-                    current_draw_color = self.colors[i, j, :]
-                    if self.color_support == COLOR_SUPPORT_256:
-                      sys.stdout.write("\033[38;2;{};{};{}m".format(current_draw_color[0], current_draw_color[1], current_draw_color[2]))
-                    else:
-                      sys.stdout.write("\033[3" + str(self._rgb_to_8(current_draw_color)) + "m")
+   
+        if self.seq % 100 == 0 or self.last_colors is None or self.last_buffer is None:
+            where_diff = np.ones(self.buffer.shape, dtype = np.bool)
+        else:
+            where_diff = (self.buffer != self.last_buffer) | \
+                         (self.colors[:, :, 0] != self.last_colors[:, :, 0]) | \
+                         (self.colors[:, :, 1] != self.last_colors[:, :, 1]) | \
+                         (self.colors[:, :, 2] != self.last_colors[:, :, 2])
 
-                if self.mode == MODE_UNICODE:
-                    sys.stdout.write(unichr(self.buffer[i, j]))
-                elif self.mode == MODE_EASCII:
-                    if self.buffer[i, j] & 0xFF00 == 0x2800:
-                        sys.stdout.write(TABLE_EASCII[self.buffer[i, j] & 0x00FF])
-                    elif self.buffer[i, j] == 0x2588:
-                        sys.stdout.write("#")
-                    elif self.buffer[i, j] & 0xFF00 == 0x00 and self.buffer[i, j] & 0x00FF != 0x00:
-                        sys.stdout.write(chr(self.buffer[i, j] & 0x00FF))
-                    else:
-                        sys.stdout.write(0x20)
+        digrid = self.igrid[where_diff]
+        djgrid = self.jgrid[where_diff]
+        dbuffer = self.buffer[where_diff]
+        dcolors = self.colors[where_diff, :]
+
+        last_i = -1
+        last_j = -1
+        for n in range(digrid.shape[0]):
+            i, j, b, c = digrid[n], djgrid[n], dbuffer[n], dcolors[n]
+
+            # move cursor to new absolute position if it is a movement by more than 1
+            if last_j != j or i - last_i > 1:
+                sys.stdout.write("\033[" + str(j+1) + ";" + str(i+1) + "H")
+    
+            if np.any(c != current_draw_color):
+                current_draw_color = c
+                if self.color_support == COLOR_SUPPORT_256:
+                  sys.stdout.write("\033[38;2;{};{};{}m".format(current_draw_color[0], current_draw_color[1], current_draw_color[2]))
+                else:
+                  sys.stdout.write("\033[3" + str(self._rgb_to_8(current_draw_color)) + "m")
+
+            if self.mode == MODE_UNICODE:
+                sys.stdout.write(unichr(b))
+            elif self.mode == MODE_EASCII:
+                if b[i, j] & 0xFF00 == 0x2800:
+                    sys.stdout.write(TABLE_EASCII[b[i, j] & 0x00FF])
+                elif b[i, j] == 0x2588:
+                    sys.stdout.write("#")
+                elif b[i, j] & 0xFF00 == 0x00 and b[i, j] & 0x00FF != 0x00:
+                    sys.stdout.write(chr(b[i, j] & 0x00FF))
+                else:
+                    sys.stdout.write(0x20)
+
+            last_i = i
+            last_j = j
+
         sys.stdout.write("\033[37m")
         sys.stdout.flush()
 
+        self.last_buffer = self.buffer.copy()
+        self.last_colors = self.colors.copy()
 
 if __name__ == '__main__':
     # perform a test if run directly

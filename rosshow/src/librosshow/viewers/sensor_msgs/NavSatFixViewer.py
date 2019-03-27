@@ -49,22 +49,31 @@ def num2deg(xtile, ytile, zoom):
   lat_deg = math.degrees(lat_rad)
   return (lat_deg, lon_deg)
 
-class LocationPlotter(object):
-    def __init__(self, g, xmin = 0, xmax = 1, ymin = 0, ymax = 1, zoom = 15, n = 128):
-        self.g = g
-        self.xmin = xmin
-        self.xmax = xmax
-        self.ymin = ymin
-        self.ymax = ymax
+class NavSatFixViewer(object):
+    def __init__(self, canvas, title = ""):
+        self.g = canvas
+        self.title = title
+        self.xmin = 0
+        self.xmax = 1
+        self.ymin = 0
+        self.ymax = 1
         self.zoom = 17
-        self.data = [ (0,0) ] * n
+        self.data = [ (0,0) ] * 128
         self.pointer = 0
+        self.last_update_shape_time = 0
 
-    def update(self, value):
+    def update(self, msg):
         self.pointer = (self.pointer + 1) % len(self.data)
-        self.data[self.pointer] = value
+        self.data[self.pointer] = (msg.latitude, msg.longitude)
 
     def draw(self):
+        t = time.time()
+
+        # capture changes in terminal shape at least every 0.25s
+        if t - self.last_update_shape_time > 0.25:
+            self.g.update_shape()
+            self.last_update_shape_time = t
+
         lat_point = self.data[self.pointer][0]
         lon_point = self.data[self.pointer][1]
         width = self.g.shape[0]
@@ -78,19 +87,19 @@ class LocationPlotter(object):
 
         self.g.clear()
 
+        # background map image
         self.g.set_color(termgraphics.COLOR_BLUE)
-
         img = img.resize((width, height), Image.NEAREST)
         self.g.image(np.array(img.getdata(), dtype = np.uint8) >> 7, img.width, img.height, (0, 0), image_type = termgraphics.IMAGE_MONOCHROME)
 
         # trail of last few positions
+        self.g.set_color(termgraphics.COLOR_WHITE)
         points = []
         for i in range(len(self.data)):
            points.append((
                width * (self.data[i][1] - lon_min) / (lon_max - lon_min),
                height * (self.data[i][0] - lat_min) / (lat_max - lat_min)
            ))
-        self.g.set_color(termgraphics.COLOR_WHITE)
         self.g.points(points, clear_block = True)
 
         # current position
@@ -108,21 +117,9 @@ class LocationPlotter(object):
                     int(height * (self.data[self.pointer][0] - lat_min) / (lat_max - lat_min)) + j
                 ), clear_block = False)
 
-class NavSatFixViewer(object):
-
-    def __init__(self, canvas, title = ""):
-        self.g = canvas
-        self.location_plotter = LocationPlotter(self.g)
-        self.title = title
-
-    def update(self, data):
-        self.location_plotter.update((data.latitude, data.longitude))
-
-    def draw(self):
-        self.location_plotter.draw()
-
         if self.title:
             self.g.set_color((0, 127, 255))
             self.g.text(self.title, (0, self.g.shape[1] - 4))
 
         self.g.draw()
+
