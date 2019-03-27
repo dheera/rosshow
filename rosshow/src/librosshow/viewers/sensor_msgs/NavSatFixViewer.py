@@ -30,9 +30,12 @@ except ImportError:
 
 @memoize
 def get_tile(xtile, ytile, zoom):
-    url = 'http://a.tile.openstreetmap.org/%s/%s/%s.png' % (zoom, xtile, ytile)
-    response = requests.get(url)
-    img = Image.open(BytesIO(response.content))
+    try:
+        url = 'http://a.tile.openstreetmap.org/%s/%s/%s.png' % (zoom, xtile, ytile)
+        response = requests.get(url)
+        img = Image.open(BytesIO(response.content))
+    except IOError:
+        return None
     return img
 
 def deg2num(lat_deg, lon_deg, zoom):
@@ -62,6 +65,16 @@ class NavSatFixViewer(object):
         self.pointer = 0
         self.last_update_shape_time = 0
 
+    def keypress(self, c):
+        if c == "+" or c == "=":
+            self.zoom += 1
+            if self.zoom > 19:
+                self.zoom = 19
+        elif c == "-":
+            self.zoom -= 1
+            if self.zoom < 5:
+                self.zoom = 5
+
     def update(self, msg):
         self.pointer = (self.pointer + 1) % len(self.data)
         self.data[self.pointer] = (msg.latitude, msg.longitude)
@@ -89,8 +102,9 @@ class NavSatFixViewer(object):
 
         # background map image
         self.g.set_color(termgraphics.COLOR_BLUE)
-        img = img.resize((width, height), Image.NEAREST)
-        self.g.image(np.array(img.getdata(), dtype = np.uint8) >> 7, img.width, img.height, (0, 0), image_type = termgraphics.IMAGE_MONOCHROME)
+        if img is not None:
+            img = img.resize((width, height), Image.NEAREST)
+            self.g.image(np.array(img.getdata(), dtype = np.uint8) >> 7, img.width, img.height, (0, 0), image_type = termgraphics.IMAGE_MONOCHROME)
 
         # trail of last few positions
         self.g.set_color(termgraphics.COLOR_WHITE)
@@ -117,9 +131,12 @@ class NavSatFixViewer(object):
                     int(height * (self.data[self.pointer][0] - lat_min) / (lat_max - lat_min)) + j
                 ), clear_block = False)
 
-        if self.title:
-            self.g.set_color((0, 127, 255))
-            self.g.text(self.title, (0, self.g.shape[1] - 4))
+        self.g.set_color((0, 127, 255))
+        self.g.text(self.title, (0, self.g.shape[1] - 4))
+
+        self.g.set_color((127, 127, 127))
+        self.g.text("+/-: zoom", (int(self.g.shape[0]/3), self.g.shape[1] - 4))
+        self.g.draw()
 
         self.g.draw()
 
