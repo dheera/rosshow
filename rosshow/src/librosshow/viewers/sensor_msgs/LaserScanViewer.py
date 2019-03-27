@@ -4,8 +4,8 @@ import time
 import librosshow.termgraphics as termgraphics
 
 class LaserScanViewer(object):
-    def __init__(self, title = ""):
-        self.g = termgraphics.TermGraphics()
+    def __init__(self, canvas, title = ""):
+        self.g = canvas
         self.scale = 10.0
         self.target_scale = 10.0
         self.target_scale_time = 0

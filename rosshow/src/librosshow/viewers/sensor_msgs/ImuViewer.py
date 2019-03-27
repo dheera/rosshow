@@ -4,8 +4,8 @@ import librosshow.termgraphics as termgraphics
 from librosshow.plotters import ScopePlotter, AnglePlotter
 
 class ImuViewer(object):
-    def __init__(self, title = ""):
-        self.g = termgraphics.TermGraphics()
+    def __init__(self, canvas, title = ""):
+        self.g = canvas
         self.last_update_shape_time = 0
         self.title = title
         self.right = 10

@@ -4,8 +4,8 @@ import librosshow.termgraphics as termgraphics
 from librosshow.plotters import ScopePlotter
 
 class SinglePlotViewer(object):
-    def __init__(self, title = "", data_field = "data"):
-        self.g = termgraphics.TermGraphics()
+    def __init__(self, canvas, title = "", data_field = "data"):
+        self.g = canvas
         self.msg = None
         self.xmax = 10
         self.title = title

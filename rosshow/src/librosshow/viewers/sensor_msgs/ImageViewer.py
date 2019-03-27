@@ -1,12 +1,11 @@
 import numpy
 import time
 import scipy.misc
-
 import librosshow.termgraphics as termgraphics
 
 class ImageViewer(object):
-    def __init__(self, title = ""):
-        self.g = termgraphics.TermGraphics()
+    def __init__(self, canvas, title = ""):
+        self.g = canvas
         self.xmax = 20
         self.ymax = 20
         self.last_update_time = 0

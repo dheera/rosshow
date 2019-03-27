@@ -232,7 +232,7 @@ class TermGraphics(object):
                 (screen_is >> 1, screen_js >> 2, 2),
                 img * self.current_color[2])
     
-        elif image_type == IMAGE_RGB_2X4 and self.mode == MODE_UNICODE:
+        elif image_type == IMAGE_RGB_2X4:
             img = np.reshape(data, (height, width, 3))
             screen_is, screen_js = np.meshgrid(np.arange(img.shape[1]), np.arange(img.shape[0]))
             screen_is += (point[0] >> 1)
@@ -269,6 +269,8 @@ class TermGraphics(object):
                 elif self.mode == MODE_EASCII:
                     if self.buffer[i, j] & 0xFF00 == 0x2800:
                         sys.stdout.write(TABLE_EASCII[self.buffer[i, j] & 0x00FF])
+                    elif self.buffer[i, j] == 0x2588:
+                        sys.stdout.write("#")
                     elif self.buffer[i, j] & 0xFF00 == 0x00 and self.buffer[i, j] & 0x00FF != 0x00:
                         sys.stdout.write(chr(self.buffer[i, j] & 0x00FF))
                     else:

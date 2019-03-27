@@ -6,8 +6,8 @@ import sensor_msgs.point_cloud2 as pcl2
 import librosshow.termgraphics as termgraphics
 
 class PointCloud2Viewer(object):
-    def __init__(self, title = ""):
-        self.g = termgraphics.TermGraphics()
+    def __init__(self, canvas, title = ""):
+        self.g = canvas
         self.scale = 20
         self.spin = 0.0
         self.tilt = np.pi / 3

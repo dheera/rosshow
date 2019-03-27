@@ -110,8 +110,8 @@ class LocationPlotter(object):
 
 class NavSatFixViewer(object):
 
-    def __init__(self, title = ""):
-        self.g = termgraphics.TermGraphics()
+    def __init__(self, canvas, title = ""):
+        self.g = canvas
         self.location_plotter = LocationPlotter(self.g)
         self.title = title
 

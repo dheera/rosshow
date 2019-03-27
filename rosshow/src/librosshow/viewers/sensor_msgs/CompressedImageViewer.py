@@ -2,6 +2,7 @@ import io
 import numpy as np
 import time
 import scipy.misc
+import librosshow.termgraphics as termgraphics
 
 try:
     import PIL
@@ -11,11 +12,9 @@ except ImportError:
     print("and try again.")
     exit()
 
-import librosshow.termgraphics as termgraphics
-
 class CompressedImageViewer(object):
-    def __init__(self, title = ""):
-        self.g = termgraphics.TermGraphics()
+    def __init__(self, canvas, title = ""):
+        self.g = canvas
         self.xmax = 20
         self.ymax = 20
         self.last_update_time = 0

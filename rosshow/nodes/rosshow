@@ -7,6 +7,7 @@ import time
 import random
 import threading
 from librosshow.getch import Getch
+import librosshow.termgraphics as termgraphics
 
 VIEWER_MAPPING = {
   "std_msgs/Float32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
@@ -43,11 +44,25 @@ def capture_key_loop(viewer):
                 viewer.keypress(c)
 
 if __name__ == "__main__":
-    if len(sys.argv) <= 1:
-        print("Usage: rosshow <topic>")
-        sys.exit(0)
+    # Parse arguments
+    # TODO: proper argument parsing
+    TOPIC = "-"
+    argi = 1
+    while TOPIC.startswith("-"):
+        if argi >= len(sys.argv):
+            print("Usage: rosshow [-a] <topic>")
+            print("   -a: Use ASCII only (no Unicode)")
+            sys.exit(0)
+        TOPIC = sys.argv[argi]
+        argi+= 1
 
-    TOPIC = sys.argv[1]
+    if ("-a" in sys.argv) or ("--ascii" in sys.argv):
+        USE_ASCII = True
+    else:
+        USE_ASCII = False
+
+    # Get information on all topic types
+
     topic_types = dict(rospy.get_published_topics())
     if TOPIC not in topic_types:
         print("Topic {0} does not appear to be published yet.".format(TOPIC))
@@ -59,20 +74,31 @@ if __name__ == "__main__":
         print("Unsupported message type.")
         exit()
 
+    # Create the canvas and viewer accordingly
+
+    canvas = termgraphics.TermGraphics( \
+            mode = (termgraphics.MODE_EASCII if USE_ASCII else termgraphics.MODE_UNICODE))
+
     module_name, class_name, viewer_kwargs = VIEWER_MAPPING[topic_types[TOPIC]]
     viewer_class = getattr(__import__(module_name, fromlist=(class_name)), class_name)
-    viewer = viewer_class(title = TOPIC, **viewer_kwargs)
+    viewer = viewer_class(canvas, title = TOPIC, **viewer_kwargs)
 
     message_package, message_name = topic_types[TOPIC].split("/", 2)
     message_class = getattr(__import__(message_package + ".msg", fromlist=(message_name)), message_name)
 
+    # Subscribe to the topic so the viewer actually gets the data
+
     rospy.Subscriber(TOPIC, message_class, viewer.update)
+
+    # Listen for keypresses
 
     getch = Getch()
 
     thread = threading.Thread(target = capture_key_loop, args = (viewer,))
     thread.daemon = True
     thread.start()
+
+    # Drawing loop
 
     rate = rospy.Rate(15)
     try:
