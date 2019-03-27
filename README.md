@@ -48,9 +48,8 @@ rosshow -a <topicname>
 
 ## sensor_msgs/PointCloud2
 
-You can rotate with the 0 and 1 keys, tilt with the 2 and 3 keys, and zoom with \[ and \]. (TODO: Arrow key support).
-
-Yes you can actually view Velodyne data in the terminal if you really want to.
+You can rotate and tilt with the arrow keys, and zoom with the +/- keys.
+This has been tested with Velodyne data. PointClouds from devices that don't have "x", "y", and "z" fields are not supported.
 
 ![screenshot](/screenshot5.png?raw=true "screenshot")
 
@@ -60,7 +59,7 @@ Yes you can actually view Velodyne data in the terminal if you really want to.
 
 ## sensor_msgs/LaserScan
 
-You can zoom with the \[ and \] keys. (TODO: Arrow key support).
+You can zoom with the +/- keys.
 
 ![screenshot](/screenshot0.png?raw=true "screenshot")
 
