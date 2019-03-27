@@ -39,6 +39,18 @@ def capture_key_loop(viewer):
         c = getch()
         if c == '\x03': # Ctrl+C
             rospy.signal_shutdown("Ctrl+C pressed")
+        if c == '\x1B': # ANSI escape
+            c = getch()
+            if c == '\x5B':
+                c = getch()
+                if c == '\x41':
+                    viewer.keypress("up")
+                if c == '\x42':
+                    viewer.keypress("down")
+                if c == '\x43':
+                    viewer.keypress("left")
+                if c == '\x44':
+                    viewer.keypress("right")
         else:
             if "keypress" in dir(viewer):
                 viewer.keypress(c)
@@ -107,4 +119,5 @@ if __name__ == "__main__":
             viewer.draw()
     finally:
         getch.reset()
+        print("\n" * 25)
 

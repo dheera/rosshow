@@ -14,10 +14,10 @@ class LaserScanViewer(object):
         self.title = title
 
     def keypress(self, c):
-        if c == "[":
+        if c == "+" or c == "=":
             self.target_scale *= 1.5
             self.target_scale_time = time.time()
-        elif c == "]":
+        elif c == "-":
             self.target_scale /= 1.5
             self.target_scale_time = time.time()
 
@@ -68,9 +68,11 @@ class LaserScanViewer(object):
         points = np.vstack((screen_is, screen_js)).T
         self.g.points(points)
 
-        if self.title:
-            self.g.set_color((0, 127, 255))
-            self.g.text(self.title, (0, self.g.shape[1] - 4))
+        self.g.set_color((0, 127, 255))
+        self.g.text(self.title, (0, self.g.shape[1] - 4))
+
+        self.g.set_color((127, 127, 127))
+        self.g.text("+/-: zoom", (int(self.g.shape[0]/3), self.g.shape[1] - 4))
         self.g.draw()
 
 
