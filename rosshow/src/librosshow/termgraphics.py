@@ -209,10 +209,17 @@ class TermGraphics(object):
                         self.point((point[0] + i, point[1] + j))
     
         elif image_type == IMAGE_RGB_2X4 and self.mode == MODE_UNICODE:
-            for i in range(width):
-                for j in range(height):
-                    self.colors[i, j, :] = data[j*width + i]
-                    self.buffer[i, j] = 0x2588
+            img = np.reshape(data, (height, width, 3))
+            screen_is, screen_js = np.meshgrid(np.arange(img.shape[1]), np.arange(img.shape[0]))
+            screen_is += (point[0] >> 1)
+            screen_js += (point[1] >> 2)
+            where_valid = (screen_is >= 0) & (screen_js >= 0) & \
+                (screen_is < self.term_shape[0]) & (screen_js < self.term_shape[1])
+            screen_is = screen_is[where_valid]
+            screen_js = screen_js[where_valid]
+            img = img[where_valid]
+            self.buffer[screen_is, screen_js] = 0x2588
+            self.colors[screen_is, screen_js, :] = img
     
     def draw(self):
         """
@@ -239,7 +246,7 @@ class TermGraphics(object):
                     if self.buffer[i, j] & 0xFF00 == 0x2800:
                         sys.stdout.write(TABLE_EASCII[self.buffer[i, j] & 0x00FF])
                     elif self.buffer[i, j] & 0xFF00 == 0x00 and self.buffer[i, j] & 0x00FF != 0x00:
-                        sys.stdout.write(self.buffer[i, j])
+                        sys.stdout.write(chr(self.buffer[i, j] & 0x00FF))
                     else:
                         sys.stdout.write(0x20)
         sys.stdout.write("\033[37m")
@@ -253,9 +260,8 @@ if __name__ == '__main__':
         g.clear()
         points = []
         for i in range(300):
-            #points.append((i, int(i*j/5)))
-            g.point((i, int(i*j/5)))
-        #g.points(points)
+           points.append((i, int(i*j/5)))
+        g.points(points)
         g.text("hello", (10, 10))
         g.draw()
         time.sleep(0.1)
