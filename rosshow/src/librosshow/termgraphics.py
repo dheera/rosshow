@@ -30,6 +30,7 @@ COLOR_WHITE = (255, 255, 255)
 COLOR_SUPPORT_1 = 0
 COLOR_SUPPORT_16 = 1
 COLOR_SUPPORT_256 = 2
+COLOR_SUPPORT_24BIT = 3
 
 MODE_UNICODE = 0
 MODE_EASCII = 2
@@ -63,13 +64,13 @@ class TermGraphics(object):
         self.mode = mode
         self.seq = 0
 
-        if self.term_type in ['xterm-256color', 'xterm']:
-          self.color_support = COLOR_SUPPORT_256
+        if self.term_type in ['xterm-256color', 'xterm'] or self.term_color in ['truecolor', '24bit']:
+          self.color_support = COLOR_SUPPORT_24BIT
         else:
           self.color_support = COLOR_SUPPORT_16
 
     def _rgb_to_8(self, rgb):
-        return (rgb[2] > 127) << 2 | (rgb[1] > 127)<<1 | (rgb[0] > 127)
+        return (rgb[2] >= 127) << 2 | (rgb[1] >= 127)<<1 | (rgb[0] >= 127)
 
     def clear(self):
         """
@@ -84,7 +85,8 @@ class TermGraphics(object):
         Fetches the terminal shape. Returns True if the shape has changed.
         """
         self.term_shape = tuple(reversed(list(map(lambda x: int(x), os.popen('stty size', 'r').read().split()))))
-        self.term_type = os.environ['TERM']
+        self.term_type = os.environ.get('TERM')
+        self.term_color = os.environ.get('COLORTERM')
         new_shape = (self.term_shape[0]*2, self.term_shape[1]*4)
         if new_shape != self.shape:
             self.shape = (self.term_shape[0]*2, self.term_shape[1]*4)
@@ -287,7 +289,7 @@ class TermGraphics(object):
     
             if np.any(c != current_draw_color):
                 current_draw_color = c
-                if self.color_support == COLOR_SUPPORT_256:
+                if self.color_support == COLOR_SUPPORT_24BIT:
                   sys.stdout.write("\033[38;2;{};{};{}m".format(current_draw_color[0], current_draw_color[1], current_draw_color[2]))
                 else:
                   sys.stdout.write("\033[3" + str(self._rgb_to_8(current_draw_color)) + "m")
