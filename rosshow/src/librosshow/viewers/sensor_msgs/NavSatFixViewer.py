@@ -36,6 +36,8 @@ def get_tile(xtile, ytile, zoom):
         img = Image.open(BytesIO(response.content))
     except IOError:
         return None
+    except requests.exceptions.ConnectionError:
+        return None
     return img
 
 def deg2num(lat_deg, lon_deg, zoom):
@@ -105,6 +107,9 @@ class NavSatFixViewer(object):
         if img is not None:
             img = img.resize((width, height), Image.NEAREST)
             self.g.image(np.array(img.getdata(), dtype = np.uint8) >> 7, img.width, img.height, (0, 0), image_type = termgraphics.IMAGE_MONOCHROME)
+        else:
+            self.g.set_color((127, 127, 127))
+            self.g.text("[Unable to retrieve map image; is this machine online?]", (0, 0))
 
         # trail of last few positions
         self.g.set_color(termgraphics.COLOR_WHITE)
