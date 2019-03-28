@@ -296,8 +296,11 @@ class TermGraphics(object):
                 current_draw_color = c
                 if self.color_support == COLOR_SUPPORT_24BIT:
                   sys.stdout.write("\033[38;2;{};{};{}m".format(current_draw_color[0], current_draw_color[1], current_draw_color[2]))
-                else:
+                elif self.color_support == COLOR_SUPPORT_256: # TODO support 256 colors but fall back to 16 for now
                   sys.stdout.write("\033[3" + str(self._rgb_to_8(current_draw_color)) + "m")
+                elif self.color_support == COLOR_SUPPORT_16:  # TODO actually implement colors 9-15
+                  sys.stdout.write("\033[3" + str(self._rgb_to_8(current_draw_color)) + "m")
+                # else do nothing -- monochrome
 
             if self.mode == MODE_UNICODE:
                 sys.stdout.write(unichr(b))

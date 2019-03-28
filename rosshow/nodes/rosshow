@@ -68,6 +68,7 @@ if __name__ == "__main__":
         if argi >= len(sys.argv):
             print("Usage: rosshow [-a] <topic>")
             print("   -a:   Use ASCII only (no Unicode)")
+            print("   -c1:  Force monochrome")
             print("   -c4:  Force 4-bit color (16 colors)")
             print("   -c24: Force 24-bit color")
             sys.exit(0)
@@ -79,7 +80,9 @@ if __name__ == "__main__":
     else:
         USE_ASCII = False
 
-    if "-c4" in sys.argv:
+    if "-c1" in sys.argv:
+        color_support = termgraphics.COLOR_SUPPORT_1
+    elif "-c4" in sys.argv:
         color_support = termgraphics.COLOR_SUPPORT_16
     elif "-c24" in sys.argv:
         color_support = termgraphics.COLOR_SUPPORT_24BIT
