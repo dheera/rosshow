@@ -43,7 +43,7 @@ Most visualizations use Unicode Braille characters to render visualizations. If 
 ```
 rosshow -a <topicname>
 ```
-You can also force 1-bit, 4-bit, or 24-bit color modes if your terminal type is not detected correctly.
+You can also force 1-bit, 4-bit, or 24-bit color modes if your terminal type is not detected correctly. You may need these when using rosshow inside of a `screen`.
 ```
 rosshow -c1 <topicname>
 rosshow -c4 <topicname>
