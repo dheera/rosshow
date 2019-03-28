@@ -28,6 +28,7 @@ class ImuViewer(object):
             bottom = vmargin + vsize,
             ymin = -math.pi,
             ymax = math.pi,
+            title = "yaw",
         )
 
         self.pitch_scope_plotter = ScopePlotter(self.g,
@@ -37,6 +38,7 @@ class ImuViewer(object):
             bottom = 2*vmargin + 2*vsize,
             ymin = -math.pi/2,
             ymax = math.pi/2,
+            title = "pitch",
         )
 
         self.roll_scope_plotter = ScopePlotter(self.g,
@@ -46,6 +48,7 @@ class ImuViewer(object):
             bottom = 3*vmargin + 3*vsize,
             ymin = -math.pi,
             ymax = math.pi,
+            title = "roll",
         )
 
         self.avx_scope_plotter = ScopePlotter(self.g,
@@ -55,6 +58,7 @@ class ImuViewer(object):
             bottom = vmargin + vsize,
             ymin = -math.pi,
             ymax = math.pi,
+            title = "ang vel x",
         )
 
         self.avy_scope_plotter = ScopePlotter(self.g,
@@ -64,6 +68,7 @@ class ImuViewer(object):
             bottom = 2*vmargin + 2*vsize,
             ymin = -math.pi,
             ymax = math.pi,
+            title = "ang vel y",
         )
 
         self.avz_scope_plotter = ScopePlotter(self.g,
@@ -73,6 +78,7 @@ class ImuViewer(object):
             bottom = 3*vmargin + 3*vsize,
             ymin = -math.pi,
             ymax = math.pi,
+            title = "ang vel z",
         )
 
         self.lax_scope_plotter = ScopePlotter(self.g,
@@ -82,6 +88,7 @@ class ImuViewer(object):
             bottom = vmargin + vsize,
             ymin = -9.8,
             ymax = 9.8,
+            title = "lin acc x",
         )
 
         self.lay_scope_plotter = ScopePlotter(self.g,
@@ -90,7 +97,8 @@ class ImuViewer(object):
             right = 3*hmargin + 3*hsize,
             bottom = 2*vmargin + 2*vsize,
             ymin = -9.8,
-            ymax = 9.8
+            ymax = 9.8,
+            title = "lin acc y",
         )
 
         self.laz_scope_plotter = ScopePlotter(self.g,
@@ -100,6 +108,7 @@ class ImuViewer(object):
             bottom = 3*vmargin + 3*vsize,
             ymin = -9.8,
             ymax = 9.8,
+            title = "lin acc z",
         )
 
     def keypress(self, c):

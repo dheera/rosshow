@@ -26,7 +26,7 @@ class AnglePlotter(object):
         )
 
 class ScopePlotter(object):
-    def __init__(self, g, left = 0, right = 1, top = 0, bottom = 1, ymin = None, ymax = None, n = 128):
+    def __init__(self, g, left = 0, right = 1, top = 0, bottom = 1, ymin = None, ymax = None, n = 128, title = None):
         self.g = g
         self.left = left
         self.right = right
@@ -37,6 +37,7 @@ class ScopePlotter(object):
         self.data = np.array([ np.nan ] * n, dtype = np.float32)
         self.data[0] = 0.0
         self.pointer = 0
+        self.title = title
 
     def get_nice_scale_bound(self, value):
         if value < 1e-6:
@@ -80,7 +81,11 @@ class ScopePlotter(object):
         for i in range(len(points) - 1):
             self.g.line(points[i], points[i+1])
 
-        self.g.set_color((127, 127, 127))
+        if self.title:
+            self.g.set_color((127, 127, 127))
+            self.g.text(self.title, (int((self.left + self.right) / 2 - 2 * len(self.title) / 2), int(self.top)))
+
+        self.g.set_color((63, 63, 63))
         self.g.text("{:2.4f}".format(ymax).rstrip("0").rstrip("."), (int(self.left), int(self.top)))
         self.g.text("{:2.4f}".format((ymax + ymin)/2).rstrip("0").rstrip("."), (int(self.left), int(self.top + (self.bottom - self.top) / 2 )))
         self.g.text("{:2.4f}".format(ymin).rstrip("0").rstrip("."), (int(self.left), int(self.bottom)))
