@@ -80,6 +80,7 @@ For most std_msgs numeric types you will get a time series plot.
 # Full list of supported types
 
 ### std_msgs
+* std_msgs/Bool
 * std_msgs/Float32
 * std_msgs/Float64
 * std_msgs/Int8
