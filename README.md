@@ -77,6 +77,10 @@ You can zoom with the +/- keys.
 
 ![screenshot](/screenshot3.png?raw=true "screenshot")
 
+The ASCII-only "-a" option works for all types. Here's what the NavSatFix message looks like on pure ASCII:
+
+![screenshot](/screenshot3-ascii.png?raw=true "screenshot")
+
 ## std_msgs/Int32, std_msgs/Float32, etc.
 
 For most std_msgs numeric types you will get a time series plot.
