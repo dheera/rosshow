@@ -105,32 +105,47 @@ class NavSatFixViewer(object):
         # background map image
         self.g.set_color(termgraphics.COLOR_BLUE)
         if img is not None:
-            img = img.resize((width, height), Image.NEAREST)
-            self.g.image(np.array(img.getdata(), dtype = np.uint8) >> 7, img.width, img.height, (0, 0), image_type = termgraphics.IMAGE_MONOCHROME)
+            img = img.convert('RGB').resize((width, height), Image.NEAREST)
+            img_data = np.fromstring(img.tobytes(), dtype = np.uint8).reshape((width, height, 3))
+
+            # "night mode" version of the image: just flip all the bits
+            img_data_night = (~img_data >> 1)
+
+            # extract the text only to re-display in higher contrast and without 2x4 block effects
+            img_data_text = (np.mean(img_data, axis = 2) < 163).astype(np.uint8) * 255
+
+            # draw night mode image
+            self.g.image(img_data_night, width, height, (0, 0), image_type = termgraphics.IMAGE_RGB)
+
+            # draw text in pure white, clearing blocks of background
+            self.g.set_color((255, 255, 255))
+            self.g.image(img_data_text, width, height, (0, 0), image_type = termgraphics.IMAGE_MONOCHROME, clear_block = True)
         else:
             self.g.set_color((127, 127, 127))
             self.g.text("[Unable to retrieve map image; is this machine online?]", (0, 0))
 
         # trail of last few positions
-        self.g.set_color(termgraphics.COLOR_WHITE)
+        self.g.set_color(termgraphics.COLOR_YELLOW)
         points = []
-        for i in range(len(self.data)):
-           points.append((
-               width * (self.data[i][1] - lon_min) / (lon_max - lon_min),
-               height * (self.data[i][0] - lat_min) / (lat_max - lat_min)
-           ))
+        for k in range(len(self.data)):
+          for i in range(-1, 2):
+            for j in range(-1, 2):
+               points.append((
+                 width * (self.data[k][1] - lon_min) / (lon_max - lon_min) + i,
+                 height * (self.data[k][0] - lat_min) / (lat_max - lat_min) + j
+               ))
         self.g.points(points, clear_block = True)
 
         # current position
         self.g.set_color(termgraphics.COLOR_RED)
-        for i in range(-1, 2):
-            for j in range(-1, 2):
+        for i in range(-3, 4):
+            for j in range(-3, 4):
                 self.g.point((
                     int(width * (self.data[self.pointer][1] - lon_min) / (lon_max - lon_min)) + i,
                     int(height * (self.data[self.pointer][0] - lat_min) / (lat_max - lat_min)) + j
                 ), clear_block = True)
-        for i in range(-1, 2):
-            for j in range(-1, 2):
+        for i in range(-3, 4):
+            for j in range(-3, 4):
                 self.g.point((
                     int(width * (self.data[self.pointer][1] - lon_min) / (lon_max - lon_min)) + i,
                     int(height * (self.data[self.pointer][0] - lat_min) / (lat_max - lat_min)) + j
@@ -141,7 +156,5 @@ class NavSatFixViewer(object):
 
         self.g.set_color((127, 127, 127))
         self.g.text("+/-: zoom", (int(self.g.shape[0]/3), self.g.shape[1] - 4))
-        self.g.draw()
-
         self.g.draw()
 

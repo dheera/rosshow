@@ -38,6 +38,7 @@ MODE_EASCII = 2
 IMAGE_MONOCHROME = 0
 IMAGE_UINT8 = 1
 IMAGE_RGB_2X4 = 2
+IMAGE_RGB = 3
 
 TABLE_EASCII = " '-'.*.|'~/~/F//-\\-~/>-&'\"\"\"/)//.\\\\\\_LLL'\"<C-=CC:\\-\\vD=D|Y|Y|)AH.!i!.ii|/\"/F/Fff//rkfPrkJJ/P/P/P//>brr>kl>&&*=fF/)vb/PPDJ)19/2/R.\\\\\\\\\\\\(=T([(((C=3-5cSct!919|7Ce,\\\\\\_\\\\\\i919i9(C|)\\\\+tv\\|719|7@9_L=L_LLL_=6[CEC[=;==c2ctJ]d=¿Z6E/\\;bsbsbj]SSd=66jj]bddsbJ]j]d]d8"
 
@@ -206,7 +207,7 @@ class TermGraphics(object):
         self.line((point1[0], point1[1]), (point1[0], point0[1]))
         self.line((point1[0], point0[1]), (point0[0], point0[1]))
     
-    def image(self, data, width, height, point, image_type = IMAGE_MONOCHROME):
+    def image(self, data, width, height, point, image_type = IMAGE_MONOCHROME, clear_block = False):
         """
         Draw a binary image with the top-left corner at point = (x0, y0).
         """
@@ -220,7 +221,7 @@ class TermGraphics(object):
                 (img > 0)
             screen_js = screen_js[where_valid]
             screen_is = screen_is[where_valid]
-            self.points(np.vstack((screen_is, screen_js)).T)
+            self.points(np.vstack((screen_is, screen_js)).T, clear_block = clear_block)
     
         elif image_type == IMAGE_UINT8:
             img = np.reshape(data, (height, width))
@@ -245,6 +246,25 @@ class TermGraphics(object):
             np.bitwise_or.at(self.colors,
                 (screen_js >> 2, screen_is >> 1, 2),
                 img * self.current_color[2])
+
+        elif image_type == IMAGE_RGB:
+            img = np.reshape(data, (height, width, 3))
+            screen_is, screen_js = np.meshgrid(np.arange(img.shape[1]), np.arange(img.shape[0]))
+            screen_js += point[1]
+            screen_is += point[0]
+            where_valid = (screen_is >= 0) & (screen_js >= 0) & \
+                (screen_is < self.shape[0]) & (screen_js < self.shape[1]) & \
+                (np.mean(img, axis = 2, dtype=np.uint8) > 0)
+            screen_js = screen_js[where_valid]
+            screen_is = screen_is[where_valid]
+            img = img[where_valid, :]
+            self.points(np.vstack((screen_is, screen_js)).T)
+            np.bitwise_and.at(self.colors,
+                (screen_js >> 2, screen_is >> 1),
+                0)
+            np.bitwise_or.at(self.colors,
+                (screen_js >> 2, screen_is >> 1),
+                img)
     
         elif image_type == IMAGE_RGB_2X4:
             img = np.reshape(data, (height, width, 3))
