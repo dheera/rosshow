@@ -75,6 +75,8 @@ You can zoom with the +/- keys.
 
 ## sensor_msgs/NavSatFix
 
+The NavSatFix visualization fetches map tiles from OpenStreetMaps, so your machine or robot needs to have internet access to be able to view those. Otherwise, you'll still be able to see a trace of points.
+
 ![screenshot](/screenshot3.png?raw=true "screenshot")
 
 The ASCII-only "-a" option works for all types. Here's what the NavSatFix message looks like on pure ASCII:
