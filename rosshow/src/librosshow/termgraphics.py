@@ -53,7 +53,7 @@ UNICODE_BRAILLE_MAP= np.array([ \
 ], dtype = np.uint8)
 
 class TermGraphics(object):
-    def __init__(self, mode = MODE_UNICODE):
+    def __init__(self, mode = MODE_UNICODE, color_support = None):
         """
         Initialization. This class takes no arguments.
         """
@@ -64,10 +64,15 @@ class TermGraphics(object):
         self.mode = mode
         self.seq = 0
 
-        if self.term_type in ['xterm-256color', 'xterm'] or self.term_color in ['truecolor', '24bit']:
-          self.color_support = COLOR_SUPPORT_24BIT
-        else:
-          self.color_support = COLOR_SUPPORT_16
+        # use user-provided color support if given
+        self.color_support = color_support
+
+        # or attempt to auto-detect
+        if self.color_support is None:
+            if self.term_type in ['xterm-256color', 'xterm'] or self.term_color in ['truecolor', '24bit']:
+                self.color_support = COLOR_SUPPORT_24BIT
+            else:
+                self.color_support = COLOR_SUPPORT_16
 
     def _rgb_to_8(self, rgb):
         return (rgb[2] >= 127) << 2 | (rgb[1] >= 127)<<1 | (rgb[0] >= 127)

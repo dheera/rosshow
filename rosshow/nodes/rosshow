@@ -67,7 +67,9 @@ if __name__ == "__main__":
     while TOPIC.startswith("-"):
         if argi >= len(sys.argv):
             print("Usage: rosshow [-a] <topic>")
-            print("   -a: Use ASCII only (no Unicode)")
+            print("   -a:   Use ASCII only (no Unicode)")
+            print("   -c4:  Force 4-bit color (16 colors)")
+            print("   -c24: Force 24-bit color")
             sys.exit(0)
         TOPIC = sys.argv[argi]
         argi+= 1
@@ -76,6 +78,13 @@ if __name__ == "__main__":
         USE_ASCII = True
     else:
         USE_ASCII = False
+
+    if "-c4" in sys.argv:
+        color_support = termgraphics.COLOR_SUPPORT_16
+    elif "-c24" in sys.argv:
+        color_support = termgraphics.COLOR_SUPPORT_24BIT
+    else:
+        color_support = None # TermGraphics class will autodetect
 
     # Get information on all topic types
 
@@ -93,7 +102,8 @@ if __name__ == "__main__":
     # Create the canvas and viewer accordingly
 
     canvas = termgraphics.TermGraphics( \
-            mode = (termgraphics.MODE_EASCII if USE_ASCII else termgraphics.MODE_UNICODE))
+            mode = (termgraphics.MODE_EASCII if USE_ASCII else termgraphics.MODE_UNICODE),
+            color_support = color_support)
 
     module_name, class_name, viewer_kwargs = VIEWER_MAPPING[topic_types[TOPIC]]
     viewer_class = getattr(__import__(module_name, fromlist=(class_name)), class_name)
