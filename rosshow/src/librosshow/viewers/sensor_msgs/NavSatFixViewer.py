@@ -38,7 +38,7 @@ def get_tile(xtile, ytile, zoom):
         return None
     except requests.exceptions.ConnectionError:
         return None
-    return img
+    return img.convert('RGB')
 
 def deg2num(lat_deg, lon_deg, zoom):
   lat_rad = math.radians(lat_deg)
@@ -105,7 +105,7 @@ class NavSatFixViewer(object):
         # background map image
         self.g.set_color(termgraphics.COLOR_BLUE)
         if img is not None:
-            img = img.convert('RGB').resize((width, height), Image.NEAREST)
+            img = img.resize((width, height), Image.NEAREST)
             img_data = np.fromstring(img.tobytes(), dtype = np.uint8).reshape((width, height, 3))
 
             # "night mode" version of the image: just flip all the bits
