@@ -132,7 +132,10 @@ if __name__ == "__main__":
     rate = rospy.Rate(15)
     try:
         while not rospy.is_shutdown():
-            rate.sleep()
+            try:
+                rate.sleep()
+            except rospy.exceptions.ROSTimeMovedBackwardsException:
+                continue
             viewer.draw()
     except rospy.exceptions.ROSInterruptException:
         sys.stdout.write("")
