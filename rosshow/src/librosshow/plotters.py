@@ -64,7 +64,7 @@ class ScopePlotter(object):
 
         if ymin is None or ymax is None:
             # Autoscale
-            ymax = self.get_nice_scale_bound(np.nanmax(self.data))
+            ymax = self.get_nice_scale_bound(np.nanmax(np.abs(self.data)))
 
             if np.nanmin(self.data) < 0:
                 ymin = -ymax
