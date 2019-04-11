@@ -117,16 +117,22 @@ class ImuViewer(object):
     def update(self, data):
         # quaternion to euler
         norm = (data.orientation.x ** 2 + data.orientation.y ** 2 + data.orientation.z ** 2 + data.orientation.w ** 2) ** 0.5
-        a = data.orientation.x / norm
-        b = data.orientation.y / norm
-        c = data.orientation.z / norm
-        d = data.orientation.w / norm
 
-        yaw = math.atan2(2*a*b+2*c*d, 1-2*b*b-2*c*c)
-        pitch = math.asin(2*(a*c-b*d))
-        roll = math.atan2(2*a*d+2*b*c, 1-2*c*c-2*d*d)+math.pi
-        if roll > math.pi:
-            roll -= 2*math.pi
+        if norm != 0.:
+            a = data.orientation.x / norm
+            b = data.orientation.y / norm
+            c = data.orientation.z / norm
+            d = data.orientation.w / norm
+
+            yaw = math.atan2(2*a*b+2*c*d, 1-2*b*b-2*c*c)
+            pitch = math.asin(2*(a*c-b*d))
+            roll = math.atan2(2*a*d+2*b*c, 1-2*c*c-2*d*d)+math.pi
+            if roll > math.pi:
+                roll -= 2*math.pi
+        else:
+            yaw = 0.
+            pitch = 0.
+            roll = 0.
 
         self.yaw_scope_plotter.update(yaw)
         self.pitch_scope_plotter.update(pitch)
