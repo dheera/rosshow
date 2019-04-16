@@ -45,16 +45,16 @@ class Points2DViewer(object):
             self.target_scale *= 1.5
             self.target_time = time.time()
         elif c == "up":
-            self.target_offset_y -= self.scale / 10
-            self.target_time = time.time()
-        elif c == "down":
             self.target_offset_y += self.scale / 10
             self.target_time = time.time()
+        elif c == "down":
+            self.target_offset_y -= self.scale / 10
+            self.target_time = time.time()
         elif c == "left":
-            self.target_offset_x -= self.scale / 10
+            self.target_offset_x += self.scale / 10
             self.target_time = time.time()
         elif c == "right":
-            self.target_offset_x += self.scale / 10
+            self.target_offset_x -= self.scale / 10
             self.target_time = time.time()
 
     def update(self, msg):
