@@ -18,10 +18,10 @@ class LaserScanViewer(Points2DViewer):
             draw_commands = [
                 (Points2DViewer.COMMAND_TYPE_LINE,
                     termgraphics.COLOR_RED,
-                    [(0, 0), (0, 1)]),
+                    [(0., 0.), (1., 0.)]),
                 (Points2DViewer.COMMAND_TYPE_LINE,
                     termgraphics.COLOR_GREEN,
-                    [(0, 0), (1, 0)]),
+                    [(0., 0.), (0., 1.)]),
                 (Points2DViewer.COMMAND_TYPE_POINTS,
                     termgraphics.COLOR_WHITE,
                     np.vstack((x_values, y_values)).T),
