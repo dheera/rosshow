@@ -2,9 +2,9 @@ import numpy as np
 import time
 
 import librosshow.termgraphics as termgraphics
-from librosshow.viewers.generic.Points2DViewer import Points2DViewer
+from librosshow.viewers.generic.Space2DViewer import Space2DViewer
 
-class LaserScanViewer(Points2DViewer):
+class LaserScanViewer(Space2DViewer):
     def __init__(self, canvas, title = ""):
         def msg_decoder(msg):
             """
@@ -16,19 +16,19 @@ class LaserScanViewer(Points2DViewer):
             y_values = ranges * np.sin(angles)
 
             draw_commands = [
-                (Points2DViewer.COMMAND_TYPE_LINE,
+                (Space2DViewer.COMMAND_TYPE_LINE,
                     termgraphics.COLOR_RED,
                     [(0., 0.), (1., 0.)]),
-                (Points2DViewer.COMMAND_TYPE_LINE,
+                (Space2DViewer.COMMAND_TYPE_LINE,
                     termgraphics.COLOR_GREEN,
                     [(0., 0.), (0., 1.)]),
-                (Points2DViewer.COMMAND_TYPE_POINTS,
+                (Space2DViewer.COMMAND_TYPE_POINTS,
                     termgraphics.COLOR_WHITE,
                     np.vstack((x_values, y_values)).T),
             ]
 
             return draw_commands
 
-        Points2DViewer.__init__(self, canvas, msg_decoder = msg_decoder, title = title)
+        Space2DViewer.__init__(self, canvas, msg_decoder = msg_decoder, title = title)
 
 

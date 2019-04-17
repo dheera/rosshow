@@ -2,9 +2,9 @@ import numpy as np
 import time
 
 import librosshow.termgraphics as termgraphics
-from librosshow.viewers.generic.Points2DViewer import Points2DViewer
+from librosshow.viewers.generic.Space2DViewer import Space2DViewer
 
-class OdometryViewer(Points2DViewer):
+class OdometryViewer(Space2DViewer):
     def __init__(self, canvas, title = ""):
         def msg_decoder(msg):
             """
@@ -16,13 +16,13 @@ class OdometryViewer(Points2DViewer):
             self.points_i = (self.points_i + 1) & 0xFF # mod 256
 
             draw_commands = [
-                (Points2DViewer.COMMAND_TYPE_LINE,
+                (Space2DViewer.COMMAND_TYPE_LINE,
                     termgraphics.COLOR_RED,
                     [(0., 0.), (1., 0.)]),
-                (Points2DViewer.COMMAND_TYPE_LINE,
+                (Space2DViewer.COMMAND_TYPE_LINE,
                     termgraphics.COLOR_GREEN,
                     [(0., 0.), (0., 1.)]),
-                (Points2DViewer.COMMAND_TYPE_POINTS,
+                (Space2DViewer.COMMAND_TYPE_POINTS,
                     termgraphics.COLOR_WHITE,
                     self.points),
             ]
@@ -44,7 +44,7 @@ class OdometryViewer(Points2DViewer):
                 yaw = np.arctan2(2*a*b+2*c*d, 1-2*b*b-2*c*c)
 
                 draw_commands.append((
-                    Points2DViewer.COMMAND_TYPE_LINE,
+                    Space2DViewer.COMMAND_TYPE_LINE,
                     (127, 127, 127),
                     [
                         (msg.pose.pose.position.x, msg.pose.pose.position.y),
@@ -59,6 +59,6 @@ class OdometryViewer(Points2DViewer):
         self.points_i = 0
         self.init_centered = False
 
-        Points2DViewer.__init__(self, canvas, msg_decoder = msg_decoder, title = title)
+        Space2DViewer.__init__(self, canvas, msg_decoder = msg_decoder, title = title)
 
 
