@@ -54,7 +54,7 @@ class OdometryViewer(Points2DViewer):
 
             return draw_commands
 
-        self.points = np.empty((256, 2), dtype = np.float32)
+        self.points = np.empty((256, 2), dtype = np.float64)
         self.points[:,:] = np.nan
         self.points_i = 0
         self.init_centered = False
