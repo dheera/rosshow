@@ -91,6 +91,9 @@ For most std_msgs numeric types you will get a time series plot.
 
 # Full list of supported types
 
+### nav_msgs
+* nav_msgs/Odometry
+
 ### std_msgs
 * std_msgs/Bool
 * std_msgs/Float32
