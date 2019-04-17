@@ -5,12 +5,12 @@ import librosshow.termgraphics as termgraphics
 
 class Points2DViewer(object):
     """
-    A generic zoomable 2D scatter point viewer. Requires a msg2points
+    A generic zoomable 2D scatter point viewer. Requires a msg_decoder
     callback function that converts a given
     ROS message into an array of points to plot.
     """
 
-    def __init__(self, canvas, msg2points = None, title = "", offset_x = 0.0, offset_y = 0.0, scale = 10.0):
+    def __init__(self, canvas, msg_decoder = None, title = "", offset_x = 0.0, offset_y = 0.0, scale = 10.0):
         # A TermGraphics canvas to draw on
         self.canvas = canvas
         
@@ -32,7 +32,7 @@ class Points2DViewer(object):
         self.last_update_shape_time = 0
 
         # Function that converts ROS message to Nx2 point array
-        self.msg2points = msg2points
+        self.msg_decoder = msg_decoder
 
         # Display title
         self.title = title
@@ -94,23 +94,33 @@ class Points2DViewer(object):
         xmax = self.scale
         ymax = self.scale * h/w
 
-        points = self.msg2points(self.msg)
+        for command_type, color, data in self.msg_decoder(self.msg):
+            if command_type == Points2DViewer.COMMAND_TYPE_POINTS:
+                self.canvas.set_color(color)
+                x = data[:,0]
+                y = data[:,1]
 
-        x = points[:,0]
-        y = points[:,1]
+                screen_is = (w * (x - self.offset_x + xmax) / (2 * xmax)).astype(np.uint16)
+                screen_js = (h * (1 - (y - self.offset_y + ymax) / (2 * ymax))).astype(np.uint16)
 
-        screen_is = (w * (x - self.offset_x + xmax) / (2 * xmax)).astype(np.uint16)
-        screen_js = (h * (1 - (y - self.offset_y + ymax) / (2 * ymax))).astype(np.uint16)
+                where_valid = ~np.isnan(screen_is) & ~np.isnan(screen_js) & \
+                        (screen_is > 0) & (screen_js > 0) & \
+                        (screen_is < w) & (screen_js < h)
+                screen_is = screen_is[where_valid]
+                screen_js = screen_js[where_valid]
 
-        where_valid = ~np.isnan(screen_is) & ~np.isnan(screen_js) & \
-                (screen_is > 0) & (screen_js > 0) & \
-                (screen_is < w) & (screen_js < h)
-        screen_is = screen_is[where_valid]
-        screen_js = screen_js[where_valid]
+                screen_points = np.vstack((screen_is, screen_js)).T
 
-        screen_points = np.vstack((screen_is, screen_js)).T
+                self.canvas.points(screen_points)
 
-        self.canvas.points(screen_points)
+            elif command_type == Points2DViewer.COMMAND_TYPE_LINE:
+                self.canvas.set_color(color)
+                screen_0_i = int(w * (data[0][0] - self.offset_x + xmax) / (2 * xmax))
+                screen_0_j = int(h * (1 - (data[0][1] - self.offset_y + ymax) / (2 * ymax)))
+                screen_1_i = int(w * (data[1][0] - self.offset_x + xmax) / (2 * xmax))
+                screen_1_j = int(h * (1 - (data[1][1] - self.offset_y + ymax) / (2 * ymax)))
+                self.canvas.line((screen_0_i, screen_0_j), (screen_1_i, screen_1_j))
+
 
         self.canvas.set_color((0, 127, 255))
         self.canvas.text(self.title, (0, self.canvas.shape[1] - 4))
@@ -120,3 +130,5 @@ class Points2DViewer(object):
         self.canvas.draw()
 
 
+Points2DViewer.COMMAND_TYPE_POINTS = 0
+Points2DViewer.COMMAND_TYPE_LINE = 1

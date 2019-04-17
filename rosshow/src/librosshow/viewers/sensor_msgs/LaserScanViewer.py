@@ -6,7 +6,7 @@ from librosshow.viewers.generic.Points2DViewer import Points2DViewer
 
 class LaserScanViewer(Points2DViewer):
     def __init__(self, canvas, title = ""):
-        def msg2points(msg):
+        def msg_decoder(msg):
             """
             Calculates (x,y) coordinates from a LaserScan message and returns them as a Nx2 numpy array.
             """
@@ -15,8 +15,20 @@ class LaserScanViewer(Points2DViewer):
             x_values = ranges * np.cos(angles)
             y_values = ranges * np.sin(angles)
 
-            return np.vstack((x_values, y_values)).T
+            draw_commands = [
+                (Points2DViewer.COMMAND_TYPE_LINE,
+                    termgraphics.COLOR_RED,
+                    [(0, 0), (0, 1)]),
+                (Points2DViewer.COMMAND_TYPE_LINE,
+                    termgraphics.COLOR_GREEN,
+                    [(0, 0), (1, 0)]),
+                (Points2DViewer.COMMAND_TYPE_POINTS,
+                    termgraphics.COLOR_WHITE,
+                    np.vstack((x_values, y_values)).T),
+            ]
 
-        Points2DViewer.__init__(self, canvas, msg2points = msg2points, title = title)
+            return draw_commands
+
+        Points2DViewer.__init__(self, canvas, msg_decoder = msg_decoder, title = title)
 
 
