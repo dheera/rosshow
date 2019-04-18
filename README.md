@@ -93,6 +93,7 @@ For most std_msgs numeric types you will get a time series plot.
 
 ### nav_msgs
 * nav_msgs/Odometry
+* nav_msgs/Path
 
 ### std_msgs
 * std_msgs/Bool
