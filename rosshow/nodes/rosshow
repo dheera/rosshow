@@ -91,14 +91,14 @@ if __name__ == "__main__":
     else:
         color_support = None # TermGraphics class will autodetect
 
+    rospy.init_node('rosshow', anonymous=True)
+
     # Get information on all topic types
 
     topic_types = dict(rospy.get_published_topics())
     if TOPIC not in topic_types:
         print("Topic {0} does not appear to be published yet.".format(TOPIC))
         sys.exit(0)
-
-    rospy.init_node('rosshow_' + str(random.randint(10000,99999)))
 
     if topic_types[TOPIC] not in VIEWER_MAPPING:
         print("Unsupported message type.")
@@ -147,5 +147,4 @@ if __name__ == "__main__":
         getch.reset()
         sys.stdout.write("\033[%d;0H\n" % canvas.term_shape[1])
         sys.stdout.flush()
-
 
