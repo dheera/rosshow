@@ -130,15 +130,16 @@ if __name__ == "__main__":
     thread.start()
 
     # Drawing loop
-
-    rate = rospy.Rate(15)
+    frame_rate = 15.
+    frame_duration = 1. / frame_rate
     try:
         while not rospy.is_shutdown():
-            try:
-                rate.sleep()
-            except rospy.exceptions.ROSTimeMovedBackwardsException:
-                continue
+            start_time = time.time()
             viewer.draw()
+            stop_time = time.time()
+            draw_time = stop_time - start_time
+            delay_time = max(0, frame_duration - draw_time)
+            time.sleep(delay_time)
     except rospy.exceptions.ROSInterruptException:
         sys.stdout.write("")
 
@@ -146,4 +147,5 @@ if __name__ == "__main__":
         getch.reset()
         sys.stdout.write("\033[%d;0H\n" % canvas.term_shape[1])
         sys.stdout.flush()
+
 
