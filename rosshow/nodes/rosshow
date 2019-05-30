@@ -11,6 +11,7 @@ import librosshow.termgraphics as termgraphics
 
 VIEWER_MAPPING = {
   "nav_msgs/Odometry": ("librosshow.viewers.nav_msgs.OdometryViewer", "OdometryViewer", {}),
+  "nav_msgs/Path": ("librosshow.viewers.nav_msgs.PathViewer", "PathViewer", {}),
   "std_msgs/Bool": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
   "std_msgs/Float32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
   "std_msgs/Float64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
@@ -90,14 +91,14 @@ if __name__ == "__main__":
     else:
         color_support = None # TermGraphics class will autodetect
 
+    rospy.init_node('rosshow', anonymous=True)
+
     # Get information on all topic types
 
     topic_types = dict(rospy.get_published_topics())
     if TOPIC not in topic_types:
         print("Topic {0} does not appear to be published yet.".format(TOPIC))
         sys.exit(0)
-
-    rospy.init_node('rosshow_' + str(random.randint(10000,99999)))
 
     if topic_types[TOPIC] not in VIEWER_MAPPING:
         print("Unsupported message type.")
@@ -129,15 +130,16 @@ if __name__ == "__main__":
     thread.start()
 
     # Drawing loop
-
-    rate = rospy.Rate(15)
+    frame_rate = 15.
+    frame_duration = 1. / frame_rate
     try:
         while not rospy.is_shutdown():
-            try:
-                rate.sleep()
-            except rospy.exceptions.ROSTimeMovedBackwardsException:
-                continue
+            start_time = time.time()
             viewer.draw()
+            stop_time = time.time()
+            draw_time = stop_time - start_time
+            delay_time = max(0, frame_duration - draw_time)
+            time.sleep(delay_time)
     except rospy.exceptions.ROSInterruptException:
         sys.stdout.write("")
 
