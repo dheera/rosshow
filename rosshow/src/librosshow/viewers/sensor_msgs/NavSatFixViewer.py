@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import functools
-from io import BytesIO
+from io import BytesIO, StringIO
 import math
 import numpy as np
 import requests
@@ -32,7 +32,9 @@ except ImportError:
 def get_tile(xtile, ytile, zoom):
     try:
         url = 'http://a.tile.openstreetmap.org/%s/%s/%s.png' % (zoom, xtile, ytile)
-        response = requests.get(url)
+        response = requests.get(url, headers = {
+        "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.112 Safari/534.30",
+        })
         img = Image.open(BytesIO(response.content))
     except IOError:
         return None
