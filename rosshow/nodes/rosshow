@@ -11,6 +11,7 @@ import librosshow.termgraphics as termgraphics
 
 VIEWER_MAPPING = {
   "nav_msgs/Odometry": ("librosshow.viewers.nav_msgs.OdometryViewer", "OdometryViewer", {}),
+  "nav_msgs/OccupancyGrid": ("librosshow.viewers.nav_msgs.OccupancyGridViewer", "OccupancyGridViewer", {}),
   "nav_msgs/Path": ("librosshow.viewers.nav_msgs.PathViewer", "PathViewer", {}),
   "std_msgs/Bool": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
   "std_msgs/Float32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
