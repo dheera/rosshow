@@ -8,6 +8,20 @@ import requests
 import time
 import librosshow.termgraphics as termgraphics
 
+# <rant>
+
+# had issues with accessing the openstreetmap tile server over IPv6.
+# force IPv4 for now. the world isn't ready for IPv6 yet. :-/
+
+import socket
+import requests.packages.urllib3.util.connection as urllib3_cn
+def allowed_gai_family():
+    family = socket.AF_INET    # force IPv4
+    return family
+urllib3_cn.allowed_gai_family = allowed_gai_family
+
+# </rant>
+
 def memoize(f):
     """ Memoization decorator for functions taking one or more arguments. """
     class memodict(dict):
@@ -33,7 +47,7 @@ def get_tile(xtile, ytile, zoom):
     try:
         url = 'http://a.tile.openstreetmap.org/%s/%s/%s.png' % (zoom, xtile, ytile)
         response = requests.get(url, headers = {
-        "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.112 Safari/534.30",
+            "User-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36",
         })
         img = Image.open(BytesIO(response.content))
     except IOError:
