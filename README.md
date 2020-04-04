@@ -89,6 +89,9 @@ For most std_msgs numeric types you will get a time series plot.
 
 ![screenshot](/screenshot6.png?raw=true "screenshot")
 
+Neat trick: You can reduce your terminal font size to get slightly higher resolution. Here's a nav\_msgs/OccupancyGrid:
+![screenshot](/screenshot7.png?raw=true "screenshot")
+
 # Full list of supported types
 
 ### nav_msgs
