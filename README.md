@@ -92,6 +92,7 @@ For most std_msgs numeric types you will get a time series plot.
 # Full list of supported types
 
 ### nav_msgs
+* nav_msgs/OccupancyGrid
 * nav_msgs/Odometry
 * nav_msgs/Path
 
