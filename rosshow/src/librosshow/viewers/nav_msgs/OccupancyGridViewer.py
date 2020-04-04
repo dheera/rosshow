@@ -15,7 +15,7 @@ class OccupancyGridViewer(GenericImageViewer):
             0-100 are probabilities and shown as white to black
             """
 
-            occupancy_map = np.array(self.msg.data, dtype=np.int16).reshape(self.msg.info.height, self.msg.info.width)
+            occupancy_map = np.array(self.msg.data, dtype=np.int16).reshape(self.msg.info.height, self.msg.info.width)[::-1, :]
 
             color_prob_zero = np.array([0, 0, 0], dtype=np.uint8)
             color_prob_one = np.array([255, 255, 255], dtype=np.uint8)
