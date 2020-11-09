@@ -10,6 +10,7 @@ from librosshow.getch import Getch
 import librosshow.termgraphics as termgraphics
 
 VIEWER_MAPPING = {
+
   "nav_msgs/Odometry": ("librosshow.viewers.nav_msgs.OdometryViewer", "OdometryViewer", {}),
   "nav_msgs/OccupancyGrid": ("librosshow.viewers.nav_msgs.OccupancyGridViewer", "OccupancyGridViewer", {}),
   "nav_msgs/Path": ("librosshow.viewers.nav_msgs.PathViewer", "PathViewer", {}),
@@ -35,6 +36,7 @@ VIEWER_MAPPING = {
   "sensor_msgs/PointCloud2": ("librosshow.viewers.sensor_msgs.PointCloud2Viewer", "PointCloud2Viewer", {}),
   "sensor_msgs/Range": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "range"}),
   "sensor_msgs/Temperature": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "temperature"}),
+  "geometry_msgs/Twist": ("librosshow.viewers.generic.MultiPlotViewer", "MultiPlotViewer", {"data_fields": ["linear.x", "linear.y", "linear.z", "angular.x", "angular.y", "angular.z"]}),
 }
 
 def capture_key_loop(viewer):
