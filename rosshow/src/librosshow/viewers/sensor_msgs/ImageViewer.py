@@ -14,6 +14,8 @@ class ImageViewer(GenericImageViewer):
 
             if msg.encoding == 'bgr8':
                 image = np.frombuffer(msg.data, np.uint8).reshape((msg.height, msg.width, 3))[:, :, ::-1]
+            elif msg.encoding == 'bgra8':
+                image = np.frombuffer(msg.data, np.uint8).reshape((msg.height, msg.width, 4))[:, :, ::-1][:,:,1:]
             elif msg.encoding == 'rgb8':
                 image = np.frombuffer(msg.data, np.uint8).reshape((msg.height, msg.width, 3))
             elif msg.encoding == 'mono8' or msg.encoding == '8UC1':
