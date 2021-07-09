@@ -45,9 +45,13 @@ except ImportError:
 @memoize
 def get_tile(xtile, ytile, zoom):
     try:
-        url = 'http://a.tile.openstreetmap.org/%s/%s/%s.png' % (zoom, xtile, ytile)
+        url = 'https://a.tile.openstreetmap.org/%s/%s/%s.png' % (zoom, xtile, ytile)
         response = requests.get(url, headers = {
-            "User-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36",
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Http-Upgrade-Insecure-Requests": "1",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            "Dnt": "1",
         })
         img = Image.open(BytesIO(response.content))
     except IOError:

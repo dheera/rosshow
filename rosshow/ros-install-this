@@ -50,7 +50,12 @@ source $ROS_REAL_ROOT/setup.bash
 cd $TEMP_DIR/src/
 catkin_init_workspace
 cd $TEMP_DIR/
-catkin_make
+
+if [ $ROS_DISTRO == "noetic" ]; then
+    catkin_make -DPYTHON_EXECUTABLE=/usr/bin/python3
+else 
+    catkin_make
+fi
 
 echo
 echo "You may be now be asked for your sudo password to complete installation."
