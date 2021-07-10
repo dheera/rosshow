@@ -23,5 +23,8 @@ setup(
         'console_scripts': [
             "rosshow = rosshow.rosshow:main",
         ],
+        'ros2cli.command': [
+            'show = rosshow.command.show:ShowCommand',
+        ]
     },
 )
