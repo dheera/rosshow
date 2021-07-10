@@ -20,8 +20,7 @@ This package will install to your ROS bin directory, i.e. where other ROS binari
 To install to the system:
 
 ```
-cd rosshow
-source /opt/ros/kinetic/setup.bash
+source /opt/ros/<kinetic, melodic, noetic>/setup.bash
 ./ros-install-this
 ```
 
