@@ -1,10 +1,19 @@
-from distutils.core import setup
-from setuptools import find_packages
-from catkin_pkg.python_setup import generate_distutils_setup
+from setuptools import setup, find_packages
 
-d = generate_distutils_setup(
-    packages=find_packages('src'),
-    package_dir={'': 'src'}
+package_name = 'librosshow'
+
+setup(
+    name='package_name',
+    version='2.0.0',
+    packages=find_packages(),
+    install_requires=[
+        'numpy',
+        'pillow',
+        'requests',
+    ],
+    maintainer='dheera',
+    maintainer_email='dheera.r.e.m.o.v.e.t.h.i.s@dheera.net',
+    description='rosshow: Visualize ROS topics in a terminal with ASCII art',
+    license='bsd.threeclause',
+    tests_require=['pytest'],
 )
-
-setup(**d)
