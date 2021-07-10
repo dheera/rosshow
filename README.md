@@ -57,40 +57,40 @@ rosshow -c24 <topicname>
 You can rotate and tilt with the arrow keys, and zoom with the +/- keys.
 This has been tested with Velodyne data. PointClouds from devices that don't have "x", "y", and "z" fields are not supported.
 
-![screenshot](/screenshot5.png?raw=true "screenshot")
+![screenshot](/screenshots/screenshot5.png?raw=true "screenshot")
 
 ## sensor_msgs/Image, sensor_msgs/CompressedImage
 
-![screenshot](/screenshot4.png?raw=true "screenshot")
+![screenshot](/screenshots/screenshot4.png?raw=true "screenshot")
 
 ## sensor_msgs/LaserScan
 
 You can zoom with the +/- keys.
 
-![screenshot](/screenshot0.png?raw=true "screenshot")
+![screenshot](/screenshots/screenshot0.png?raw=true "screenshot")
 
 ## sensor_msgs/Imu
 
-![screenshot](/screenshot2.png?raw=true "screenshot")
+![screenshot](/screenshots/screenshot2.png?raw=true "screenshot")
 
 ## sensor_msgs/NavSatFix
 
 The NavSatFix visualization fetches map tiles from OpenStreetMaps, so your machine or robot needs to have internet access to be able to view those. Otherwise, you'll still be able to see a trace of points.
 
-![screenshot](/screenshot3.png?raw=true "screenshot")
+![screenshot](/screenshots/screenshot3.png?raw=true "screenshot")
 
 The ASCII-only "-a" option works for all types. Here's what the NavSatFix message looks like on pure ASCII:
 
-![screenshot](/screenshot3-ascii.png?raw=true "screenshot")
+![screenshot](/screenshots/screenshot3-ascii.png?raw=true "screenshot")
 
 ## std_msgs/Int32, std_msgs/Float32, etc.
 
 For most std_msgs numeric types you will get a time series plot.
 
-![screenshot](/screenshot6.png?raw=true "screenshot")
+![screenshot](/screenshots/screenshot6.png?raw=true "screenshot")
 
 Neat trick: You can reduce your terminal font size to get slightly higher resolution. Here's a nav\_msgs/OccupancyGrid:
-![screenshot](/screenshot7.png?raw=true "screenshot")
+![screenshot](/screenshots/screenshot7.png?raw=true "screenshot")
 
 # Full list of supported types
 
