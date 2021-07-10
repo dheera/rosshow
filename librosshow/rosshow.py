@@ -5,7 +5,7 @@ import os
 try:
     import rospy # ROS1
 except ImportError:
-    import librosshow.rospy2 as rospy # ROS2
+    import librosshow.rospy2 as rospy # ROS2, run as module
 except ModuleNotFoundError as e:
     print(str(e))
     exit(1)
