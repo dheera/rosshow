@@ -21,6 +21,7 @@ To install to the system:
 
 ```
 source /opt/ros/<kinetic, melodic, noetic>/setup.bash
+./configure-ros1
 ./ros-install-this
 ```
 
