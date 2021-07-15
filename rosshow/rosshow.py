@@ -17,6 +17,8 @@ import threading
 from librosshow.getch import Getch
 import librosshow.termgraphics as termgraphics
 
+getch = Getch()
+
 VIEWER_MAPPING = {
 
   "nav_msgs/Odometry": ("librosshow.viewers.nav_msgs.OdometryViewer", "OdometryViewer", {}),
@@ -133,8 +135,6 @@ def main():
     rospy.Subscriber(TOPIC, message_class, viewer.update)
 
     # Listen for keypresses
-
-    getch = Getch()
 
     thread = threading.Thread(target = capture_key_loop, args = (viewer,))
     thread.daemon = True
