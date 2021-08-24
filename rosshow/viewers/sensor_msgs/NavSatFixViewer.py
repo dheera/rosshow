@@ -6,7 +6,7 @@ import math
 import numpy as np
 import requests
 import time
-import librosshow.termgraphics as termgraphics
+import rosshow.termgraphics as termgraphics
 
 # <rant>
 

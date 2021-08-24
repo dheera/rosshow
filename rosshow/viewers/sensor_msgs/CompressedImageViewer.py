@@ -2,8 +2,8 @@ import io
 import numpy as np
 import sys
 
-import librosshow.termgraphics as termgraphics
-from librosshow.viewers.generic.GenericImageViewer import GenericImageViewer
+import rosshow.termgraphics as termgraphics
+from rosshow.viewers.generic.GenericImageViewer import GenericImageViewer
 
 try:
     import PIL.Image

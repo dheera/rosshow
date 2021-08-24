@@ -1,6 +1,7 @@
 import numpy as np
 import time
-import librosshow.termgraphics as termgraphics
+import rosshow.termgraphics as termgraphics
+import sys
 
 try:
     import PIL.Image

@@ -3,7 +3,7 @@
 import time
 import numpy as np
 import sensor_msgs.point_cloud2 as pcl2
-import librosshow.termgraphics as termgraphics
+import rosshow.termgraphics as termgraphics
 
 class PointCloud2Viewer(object):
     def __init__(self, canvas, title = ""):

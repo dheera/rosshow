@@ -1,8 +1,8 @@
 import numpy as np
 import time
 
-import librosshow.termgraphics as termgraphics
-from librosshow.viewers.generic.Space2DViewer import Space2DViewer
+import rosshow.termgraphics as termgraphics
+from rosshow.viewers.generic.Space2DViewer import Space2DViewer
 
 class OdometryViewer(Space2DViewer):
     def __init__(self, canvas, title = ""):

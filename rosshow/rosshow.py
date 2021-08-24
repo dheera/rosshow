@@ -5,7 +5,7 @@ import os
 try:
     import rospy # ROS1
 except ImportError:
-    import librosshow.rospy2 as rospy # ROS2
+    import rosshow.rospy2 as rospy # ROS2
 except ModuleNotFoundError as e:
     print(str(e))
     exit(1)
@@ -14,39 +14,39 @@ import sys
 import time
 import random
 import threading
-from librosshow.getch import Getch
-import librosshow.termgraphics as termgraphics
+from rosshow.getch import Getch
+import rosshow.termgraphics as termgraphics
 
 getch = Getch()
 
 VIEWER_MAPPING = {
 
-  "nav_msgs/Odometry": ("librosshow.viewers.nav_msgs.OdometryViewer", "OdometryViewer", {}),
-  "nav_msgs/OccupancyGrid": ("librosshow.viewers.nav_msgs.OccupancyGridViewer", "OccupancyGridViewer", {}),
-  "nav_msgs/Path": ("librosshow.viewers.nav_msgs.PathViewer", "PathViewer", {}),
-  "std_msgs/Bool": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "std_msgs/Float32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "std_msgs/Float64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "std_msgs/Int8": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "std_msgs/Int16": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "std_msgs/Int32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "std_msgs/Int64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "std_msgs/UInt8": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "std_msgs/UInt16": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "std_msgs/UInt32": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "std_msgs/UInt64": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
-  "sensor_msgs/CompressedImage": ("librosshow.viewers.sensor_msgs.CompressedImageViewer", "CompressedImageViewer", {}),
-  "sensor_msgs/FluidPressure": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "fluid_pressure"}),
-  "sensor_msgs/RelativeHumidity": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "relative_humidity"}),
-  "sensor_msgs/Illuminance": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "illuminance"}),
-  "sensor_msgs/Image": ("librosshow.viewers.sensor_msgs.ImageViewer", "ImageViewer", {}),
-  "sensor_msgs/Imu": ("librosshow.viewers.sensor_msgs.ImuViewer", "ImuViewer", {}),
-  "sensor_msgs/LaserScan": ("librosshow.viewers.sensor_msgs.LaserScanViewer", "LaserScanViewer", {}),
-  "sensor_msgs/NavSatFix": ("librosshow.viewers.sensor_msgs.NavSatFixViewer", "NavSatFixViewer", {}),
-  "sensor_msgs/PointCloud2": ("librosshow.viewers.sensor_msgs.PointCloud2Viewer", "PointCloud2Viewer", {}),
-  "sensor_msgs/Range": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "range"}),
-  "sensor_msgs/Temperature": ("librosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "temperature"}),
-  "geometry_msgs/Twist": ("librosshow.viewers.generic.MultiPlotViewer", "MultiPlotViewer", {"data_fields": ["linear.x", "linear.y", "linear.z", "angular.x", "angular.y", "angular.z"]}),
+  "nav_msgs/Odometry": ("rosshow.viewers.nav_msgs.OdometryViewer", "OdometryViewer", {}),
+  "nav_msgs/OccupancyGrid": ("rosshow.viewers.nav_msgs.OccupancyGridViewer", "OccupancyGridViewer", {}),
+  "nav_msgs/Path": ("rosshow.viewers.nav_msgs.PathViewer", "PathViewer", {}),
+  "std_msgs/Bool": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Float32": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Float64": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Int8": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Int16": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Int32": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/Int64": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/UInt8": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/UInt16": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/UInt32": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "std_msgs/UInt64": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {}),
+  "sensor_msgs/CompressedImage": ("rosshow.viewers.sensor_msgs.CompressedImageViewer", "CompressedImageViewer", {}),
+  "sensor_msgs/FluidPressure": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "fluid_pressure"}),
+  "sensor_msgs/RelativeHumidity": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "relative_humidity"}),
+  "sensor_msgs/Illuminance": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "illuminance"}),
+  "sensor_msgs/Image": ("rosshow.viewers.sensor_msgs.ImageViewer", "ImageViewer", {}),
+  "sensor_msgs/Imu": ("rosshow.viewers.sensor_msgs.ImuViewer", "ImuViewer", {}),
+  "sensor_msgs/LaserScan": ("rosshow.viewers.sensor_msgs.LaserScanViewer", "LaserScanViewer", {}),
+  "sensor_msgs/NavSatFix": ("rosshow.viewers.sensor_msgs.NavSatFixViewer", "NavSatFixViewer", {}),
+  "sensor_msgs/PointCloud2": ("rosshow.viewers.sensor_msgs.PointCloud2Viewer", "PointCloud2Viewer", {}),
+  "sensor_msgs/Range": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "range"}),
+  "sensor_msgs/Temperature": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "temperature"}),
+  "geometry_msgs/Twist": ("rosshow.viewers.generic.MultiPlotViewer", "MultiPlotViewer", {"data_fields": ["linear.x", "linear.y", "linear.z", "angular.x", "angular.y", "angular.z"]}),
 }
 
 def capture_key_loop(viewer):

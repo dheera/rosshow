@@ -1,6 +1,6 @@
 import math
 import numpy as np
-import librosshow.termgraphics as termgraphics
+import rosshow.termgraphics as termgraphics
 class AnglePlotter(object):
     def __init__(self, g, left = 0, right = 1, top = 0, bottom = 1):
         self.g = g

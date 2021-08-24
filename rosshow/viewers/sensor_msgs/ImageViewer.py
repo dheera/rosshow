@@ -1,7 +1,7 @@
 import numpy as np
 
-import librosshow.termgraphics as termgraphics
-from librosshow.viewers.generic.GenericImageViewer import GenericImageViewer
+import rosshow.termgraphics as termgraphics
+from rosshow.viewers.generic.GenericImageViewer import GenericImageViewer
 
 class ImageViewer(GenericImageViewer):
     def __init__(self, canvas, title = ""):

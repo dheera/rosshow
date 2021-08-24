@@ -1,9 +1,9 @@
 import numpy as np
 import time
 import PIL.Image
-import librosshow.termgraphics as termgraphics
+import rosshow.termgraphics as termgraphics
 
-from librosshow.viewers.generic.GenericImageViewer import GenericImageViewer
+from rosshow.viewers.generic.GenericImageViewer import GenericImageViewer
 
 class OccupancyGridViewer(GenericImageViewer):
     def __init__(self, canvas, title = ""):

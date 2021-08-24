@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-from librosshow import rosshow
-rosshow.main()
+from rosshow.rosshow import main
+main()
