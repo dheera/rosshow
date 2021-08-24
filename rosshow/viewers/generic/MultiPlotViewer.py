@@ -1,7 +1,7 @@
 import time
 import math
-import librosshow.termgraphics as termgraphics
-from librosshow.plotters import ScopePlotter, AnglePlotter
+import rosshow.termgraphics as termgraphics
+from rosshow.plotters import ScopePlotter, AnglePlotter
 import operator
 
 

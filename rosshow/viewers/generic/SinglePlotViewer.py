@@ -1,7 +1,7 @@
 import time
 import math
-import librosshow.termgraphics as termgraphics
-from librosshow.plotters import ScopePlotter
+import rosshow.termgraphics as termgraphics
+from rosshow.plotters import ScopePlotter
 
 class SinglePlotViewer(object):
     def __init__(self, canvas, title = "", data_field = "data"):
