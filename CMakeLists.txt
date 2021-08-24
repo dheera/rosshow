@@ -15,6 +15,5 @@ catkin_package()
 
 catkin_install_python(PROGRAMS
   nodes/rosshow
-  DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
