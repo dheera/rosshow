@@ -1,0 +1,59 @@
+name: rosshow
+version: '2.0.0'
+summary: Visualize ROS topics in a terminal with ASCII art
+description: |
+  Have you ever SSH'ed into a robot to debug whether sensors are outputting
+  what they should, e.g. `rostopic echo /camera/image_raw`?
+
+  If so, `rosshow` is for you.
+
+  This displays various sensor messages in a useful fashion using Unicode Braille art
+  in the terminal so you don't need to fire up port forwards, Rviz,
+  or any other shenanigans just to see if something is working.
+  It currently only supports types from `std_msgs` and `sensor_msgs` but support for more types is coming.
+  Contributions welcome!
+
+  After installation, you can immediately run it with:
+
+    rosshow <topicname>
+
+  Most visualizations use Unicode Braille characters to render visualizations. If your terminal supports only ASCII, you can use the `-a` option for a purely ASCII-art render:
+
+    rosshow -a <topicname>
+
+  You can also force 1-bit, 4-bit, or 24-bit color modes if your terminal type is not detected correctly. You may need these when using rosshow inside of a `screen`.
+
+    rosshow -c1 <topicname>
+    rosshow -c4 <topicname>
+    rosshow -c24 <topicname>
+
+  Also be sure to check out my web visualization tool, `rosboard` at https://github.com/dheera/rosboard.
+
+license: BSD-3-Clause
+
+grade: stable
+confinement: strict
+base: core20 # Noetic
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: armhf
+
+parts:
+
+  rosboard:
+    plugin: catkin
+    source: .
+    stage-packages:
+      - ros-noetic-rosbash # for rosrun
+
+apps:
+
+  rosshow:
+    command: opt/ros/noetic/bin/rosrun rosshow rosshow
+    plugs: [network, network-bind]
+    extensions: [ros1-noetic]
+    environment:
+      "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/blas:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/lapack"
+      "ROS_HOME": "$SNAP_USER_DATA" # remap HOME for rospack
