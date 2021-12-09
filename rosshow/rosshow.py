@@ -111,6 +111,7 @@ def main():
     # Get information on all topic types
 
 
+    time.sleep(1) # give a little time for topics discovery
     topic_types = dict(rospy.get_published_topics())
     if TOPIC not in topic_types:
         print("Topic {0} does not appear to be published yet.".format(TOPIC))
