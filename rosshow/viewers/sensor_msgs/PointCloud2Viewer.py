@@ -2,7 +2,11 @@
 
 import time
 import numpy as np
-import sensor_msgs.point_cloud2 as pcl2
+try:
+    import sensor_msgs.point_cloud2 as pcl2
+except ImportError:  # ins ros2 sensor_msgs.point_cloud2 is not available
+    import rosshow.viewers.sensor_msgs.ros2_pointcloud2 as pcl2
+
 import rosshow.termgraphics as termgraphics
 
 class PointCloud2Viewer(object):
