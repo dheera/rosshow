@@ -139,9 +139,20 @@ def main():
     message_package, message_name = topic_type.split("/", 2)
     message_class = getattr(__import__(message_package + ".msg", fromlist=(message_name)), message_name)
 
-    # Subscribe to the topic so the viewer actually gets the data
-
-    rospy.Subscriber(TOPIC, message_class, viewer.update)
+    if ros2:
+        from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
+        qos = QoSProfile(
+                depth=10,
+                reliability=QoSReliabilityPolicy.BEST_EFFORT,
+                # reliability=QoSReliabilityPolicy.RELIABLE,
+                durability=QoSDurabilityPolicy.VOLATILE,
+                # durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
+            )
+        # Subscribe to the topic so the viewer actually gets the data
+        rospy.Subscriber(TOPIC, message_class, viewer.update, qos=qos)
+    else:
+        # Subscribe to the topic so the viewer actually gets the data
+        rospy.Subscriber(TOPIC, message_class, viewer.update)
 
     # Listen for keypresses
 
