@@ -213,7 +213,7 @@ class Publisher(object):
         _node.destroy_publisher(self._pub)
 
 class Subscriber(object):
-    def __init__(self, topic_name, topic_type, callback, callback_args = None, qos=10):
+    def __init__(self, topic_name, topic_type, callback, callback_args = None, qos = 10):
         global _node
         self.reg_type = "sub"
         self.data_class = topic_type
