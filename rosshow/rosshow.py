@@ -21,6 +21,7 @@ getch = Getch()
 
 VIEWER_MAPPING = {
 
+  # ROS1.
   "nav_msgs/Odometry": ("rosshow.viewers.nav_msgs.OdometryViewer", "OdometryViewer", {}),
   "nav_msgs/OccupancyGrid": ("rosshow.viewers.nav_msgs.OccupancyGridViewer", "OccupancyGridViewer", {}),
   "nav_msgs/Path": ("rosshow.viewers.nav_msgs.PathViewer", "PathViewer", {}),
@@ -48,6 +49,14 @@ VIEWER_MAPPING = {
   "sensor_msgs/Temperature": ("rosshow.viewers.generic.SinglePlotViewer", "SinglePlotViewer", {"data_field": "temperature"}),
   "geometry_msgs/Twist": ("rosshow.viewers.generic.MultiPlotViewer", "MultiPlotViewer", {"data_fields": ["linear.x", "linear.y", "linear.z", "angular.x", "angular.y", "angular.z"]}),
 }
+
+# ROS2, e.g. nav_msgs/Odometry -> nav_msgs/msg/Odometry.
+_viewer_mapping_ros2 = {}
+for k, v in VIEWER_MAPPING.items():
+    message_package, message_name = k.split("/", 2)
+    _viewer_mapping_ros2[f'{message_package}/msg/{message_name}'] = v
+VIEWER_MAPPING.update(_viewer_mapping_ros2)
+
 
 def capture_key_loop(viewer):
     global getch
@@ -114,7 +123,7 @@ def main():
         sys.exit(0)
 
     if topic_types[TOPIC] not in VIEWER_MAPPING:
-        print("Unsupported message type.")
+        print(f"Unsupported message type '{topic_types[TOPIC]}'.")
         exit()
 
     # Create the canvas and viewer accordingly
@@ -127,7 +136,13 @@ def main():
     viewer_class = getattr(__import__(module_name, fromlist=(class_name)), class_name)
     viewer = viewer_class(canvas, title = TOPIC, **viewer_kwargs)
 
-    message_package, message_name = topic_types[TOPIC].split("/", 2)
+    try:
+        # ROS1.
+        message_package, message_name = topic_types[TOPIC].split("/", 2)
+    except ValueError:
+        # ROS2.
+        message_package, _, message_name = topic_types[TOPIC].split("/", 3)
+
     message_class = getattr(__import__(message_package + ".msg", fromlist=(message_name)), message_name)
 
     # Subscribe to the topic so the viewer actually gets the data
