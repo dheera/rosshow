@@ -86,6 +86,8 @@ def main():
             print("   -c1:  Force monochrome")
             print("   -c4:  Force 4-bit color (16 colors)")
             print("   -c24: Force 24-bit color")
+            print("   --reliable: reliability QoS in ros2 (default: best_effort)")
+            print("   --transient-local: durability QoS in ros2 (default: volatile)")
             sys.exit(0)
         TOPIC = sys.argv[argi]
         argi+= 1
@@ -104,16 +106,31 @@ def main():
     else:
         color_support = None # TermGraphics class will autodetect
 
+    # Parse ROS2 QoS
+    qos_reliable = False
+    if "--reliable" in sys.argv:
+        qos_reliable = True
+    qos_transient_local = False
+    if "--transient-local" in sys.argv:
+        qos_transient_local = True
+
     rospy.init_node('rosshow', anonymous=True)
 
     # Get information on all topic types
 
+
+    time.sleep(1) # give a little time for topics discovery
     topic_types = dict(rospy.get_published_topics())
     if TOPIC not in topic_types:
         print("Topic {0} does not appear to be published yet.".format(TOPIC))
         sys.exit(0)
+    
+    topic_type = topic_types[TOPIC]
+    if rospy.__name__ == "rospy2":
+        # if ros2, just remove the /msg/ to be compatible with ros1
+        topic_type = topic_type.replace("/msg/", "/")
 
-    if topic_types[TOPIC] not in VIEWER_MAPPING:
+    if topic_type not in VIEWER_MAPPING:
         print("Unsupported message type.")
         exit()
 
@@ -123,16 +140,24 @@ def main():
             mode = (termgraphics.MODE_EASCII if USE_ASCII else termgraphics.MODE_UNICODE),
             color_support = color_support)
 
-    module_name, class_name, viewer_kwargs = VIEWER_MAPPING[topic_types[TOPIC]]
+    module_name, class_name, viewer_kwargs = VIEWER_MAPPING[topic_type]
     viewer_class = getattr(__import__(module_name, fromlist=(class_name)), class_name)
     viewer = viewer_class(canvas, title = TOPIC, **viewer_kwargs)
 
-    message_package, message_name = topic_types[TOPIC].split("/", 2)
+    message_package, message_name = topic_type.split("/", 2)
     message_class = getattr(__import__(message_package + ".msg", fromlist=(message_name)), message_name)
 
+    kwargs = {}
+    if rospy.__name__ == "rospy2":
+        # In ros2 we also can pass QoS parameters to the subscriber.
+        from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
+        kwargs = {"qos": QoSProfile(
+                                    depth=10,
+                                    reliability=QoSReliabilityPolicy.RELIABLE if qos_reliable else QoSReliabilityPolicy.BEST_EFFORT,
+                                    durability=QoSDurabilityPolicy.TRANSIENT_LOCAL if qos_transient_local else QoSDurabilityPolicy.VOLATILE,
+                                )}
     # Subscribe to the topic so the viewer actually gets the data
-
-    rospy.Subscriber(TOPIC, message_class, viewer.update)
+    rospy.Subscriber(TOPIC, message_class, viewer.update, **kwargs)
 
     # Listen for keypresses
 
