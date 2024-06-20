@@ -15,28 +15,19 @@ Prerequisites:
 sudo pip install numpy pillow requests
 ```
 
-This package will install to your ROS bin directory, i.e. where other ROS binaries such as rostopic, rosnode, etc. are located. Or if you don't want to do that or don't have permissions, you can add it to your catkin workspace and run it using rosrun.
-
-To install to the system:
-
-```
-source /opt/ros/<kinetic, melodic, noetic>/setup.bash
-./configure-ros1
-./ros-install-this
-```
+This package works with both ROS1 and ROS2. You can add it to either a catkin (ROS1) or colcon (ROS2) workspace and it should work.
 
 # Usage
 
 If you installed it to the system:
-
 ```
 rosshow <topicname>
 ```
 
-If you're using it from a catkin workspace:
-
+If you're using it from a catkin or colcon workspace:
 ```
-rosrun rosshow rosshow <topicname>
+rosrun rosshow rosshow <topicname>      # ROS1
+ros2 run rosshow rosshow <topicname>    # ROS2
 ```
 
 Most visualizations use Unicode Braille characters to render visualizations. If your terminal supports only ASCII, you can use the `-a` option for a purely ASCII-art render:
