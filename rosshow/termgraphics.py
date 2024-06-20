@@ -291,7 +291,7 @@ class TermGraphics(object):
         current_draw_color = -1
    
         if self.seq % 100 == 0 or self.last_colors is None or self.last_buffer is None:
-            where_diff = np.ones(self.buffer.shape, dtype = np.bool)
+            where_diff = np.ones(self.buffer.shape, dtype = bool)
         else:
             where_diff = (self.buffer != self.last_buffer) | \
                          (self.colors[:, :, 0] != self.last_colors[:, :, 0]) | \
