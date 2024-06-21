@@ -4,10 +4,12 @@ package_name = 'rosshow'
 
 setup(
     name=package_name,
-    version='2.0.0',
+    version='2.0.1',
     packages=find_packages(),
     data_files=[
         ('share/' + package_name, ['package.xml']),
+        ('share/ament_index/resource_index/packages',
+            ['resource/' + package_name]),
     ],
     install_requires=[
         'numpy',
@@ -15,7 +17,7 @@ setup(
         'requests',
     ],
     maintainer='dheera',
-    maintainer_email='dheera.r.e.m.o.v.e.t.h.i.s@dheera.net',
+    maintainer_email='dheera@dheera.net',
     description='rosshow: Visualize ROS topics in a terminal with ASCII art',
     license='bsd.threeclause',
     tests_require=['pytest'],

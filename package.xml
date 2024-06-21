@@ -1,7 +1,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>rosshow</name>
-  <version>2.0.0</version>
+  <version>2.0.1</version>
   <description>rosshow</description>
   <maintainer email="dheera@dheera.net">dheera</maintainer>
   <license>BSD</license>
@@ -17,7 +17,6 @@
   <exec_depend>python3-numpy</exec_depend>
   <exec_depend>python3-pil</exec_depend>
   <exec_depend>python3-requests</exec_depend>
-  <exec_depend>rospy</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
 
